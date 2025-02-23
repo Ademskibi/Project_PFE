@@ -11,32 +11,39 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+
 export const createUser = async (req, res) => {
   try {
-    const { userId, name, email, password, departmentName, role } = req.body;
+    const { userId, name, email, password, departmentId, role } = req.body;
 
-    if (!userId || !name || !email || !password || !role) {
+    // ✅ Validate required fields
+    if (!userId || !name || !email || !password || !role || !departmentId) {
       return res.status(400).json({ message: "❌ All fields are required" });
     }
 
+
+    // ✅ Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "❌ User already exists" });
     }
 
-    const department = await Department.findOne({ name: departmentName });
+    // ✅ Ensure the department exists
+    const department = await Department.findById(departmentId);
     if (!department) {
       return res.status(400).json({ message: "❌ Department not found" });
     }
 
+    // ✅ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // ✅ Create new user
     const newUser = new User({
       userId,
       name,
       email,
       password: hashedPassword,
-      departmentId: department._id,
+      departmentId,
       role
     });
 
@@ -44,9 +51,11 @@ export const createUser = async (req, res) => {
     res.status(201).json({ message: "✅ User created successfully", user: newUser });
 
   } catch (error) {
-    res.status(500).json({ message: "❌ Error creating user", error: error.message });
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "❌ Internal server error", error: error.message });
   }
 };
+
 
 export const deleteUser = async (req, res) => {
   try {
@@ -74,7 +83,7 @@ export const deleteUser = async (req, res) => {
 };
 
 // ✅ UPDATE USER FUNCTION
-/*export const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const { userId, id, name, email, password, departmentName, role } = req.body;
 
@@ -111,7 +120,7 @@ export const deleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "❌ Error updating user", error: error.message });
   }
-};*/
+};
 export const getUsersByRole = async (req, res) => {
     try {
       const { role } = req.body;

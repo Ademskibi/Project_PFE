@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// ✅ Get all departments
 export const getAllDepartments = async (req, res) => {
   try {
     const departments = await Department.find();
@@ -14,7 +13,6 @@ export const getAllDepartments = async (req, res) => {
   }
 };
 
-// ✅ Get a single department by ID or Name
 export const getADepartment = async (req, res) => {
   try {
     const { name, departmentId } = req.body;
@@ -40,7 +38,6 @@ export const getADepartment = async (req, res) => {
   }
 };
 
-// ✅ Create a new department
 export const createDepartment = async (req, res) => {
   try {
     const { departmentId, name } = req.body;
@@ -64,7 +61,6 @@ export const createDepartment = async (req, res) => {
   }
 };
 
-// ✅ Delete a department
 export const deleteDepartment = async (req, res) => {
   try {
     const { departmentId, id } = req.body;

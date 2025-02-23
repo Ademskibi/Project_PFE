@@ -5,9 +5,6 @@ import dotenv from "dotenv";
 
 dotenv.config(); // Ensure .env variables are loaded
 
-/**
- * Handle user login
- */
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -25,7 +22,7 @@ export const loginUser = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "5h" }
     );
 
     res.status(200).json({ message: "✅ Login successful", token });

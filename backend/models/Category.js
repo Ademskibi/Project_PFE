@@ -1,9 +1,16 @@
 import mongoose from "mongoose";
+import mongooseSequence from "mongoose-sequence";
 
-const CategorySchema = new mongoose.Schema({
-    categoryId: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }] // Array of product references
-}, { timestamps: true });
+const AutoIncrement = mongooseSequence(mongoose);
 
-export default mongoose.model("Category", CategorySchema);
+const categorySchema = new mongoose.Schema({
+  categoryId: { type: Number, unique: true },
+  name: { type: String, required: true },
+  items: { type: Array, default: [] }
+});
+
+// Apply auto-increment to `categoryId`
+categorySchema.plugin(AutoIncrement, { inc_field: 'categoryId' });
+
+export default mongoose.model('Category', categorySchema);
+

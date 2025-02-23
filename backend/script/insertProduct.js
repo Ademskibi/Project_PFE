@@ -10,9 +10,9 @@ connectDB();
 const insertProduct = async () => {
   try {
     const newProduct = await Product.create({
-          itemId: "12", 
+          itemId: "15", 
           name:"test",
-          categoryId:"67adb4a782939da30f02e883" ,
+          categoryId:"1" ,
           quantity: 10
        
     });

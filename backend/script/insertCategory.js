@@ -10,8 +10,8 @@ connectDB();
 const insertCategory = async () => {
   try {
     const newCategory =await Category.create({
-        categoryId: "1", 
-        name:"test",
+        categoryId: "2", 
+        name:"Electronics",
        items:['67adb2905e0f538159678505']
     });
 
