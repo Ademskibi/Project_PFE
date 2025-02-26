@@ -33,17 +33,7 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
 
-// Define multer storage configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/"); // Set the destination folder for uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname); // Ensure a unique filename
-    },
-});
-
-// Initialize multer with storage
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Cloudinary configuration
@@ -69,20 +59,15 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
             return res.status(400).json({ error: "No file uploaded" });
         }
 
-        // Log the file path for debugging
-        console.log("Uploaded file path:", req.file.path);
+        // Convert image buffer to base64
+        const base64String = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-        // Upload file to Cloudinary
-        const result = await cloudinaryV2.uploader.upload(req.file.path, {
-            folder: "products", // Optional: specify a folder in Cloudinary for image storage
+        // Upload to Cloudinary
+        const result = await cloudinaryV2.uploader.upload(base64String, {
+            folder: "products",
+            resource_type: "auto",
         });
 
-        // Clean up the temporary file after successful upload
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
-
-        // Return the secure URL
         res.status(200).json({
             success: true,
             message: "File uploaded successfully",
@@ -90,11 +75,10 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
         });
     } catch (error) {
         console.error("Error uploading file:", error);
-        res.status(500).json({
-            error: "An error occurred during the upload",
-        });
+        res.status(500).json({ error: "An error occurred during the upload" });
     }
 });
+
 
 // Welcome Route
 app.get("/", (req, res) => res.send("Welcome to the MERN API!"));

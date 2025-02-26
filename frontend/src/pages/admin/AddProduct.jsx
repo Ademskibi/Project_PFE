@@ -19,6 +19,7 @@ const imageUpload = async (file) => {
                 },
             }
         );
+        console.log("Image uploaded successfully:", response.data);
         return response.data.secure_url; // Extract the secure URL from the response
     } catch (error) {
         console.error("Error uploading image:", error);
@@ -34,6 +35,7 @@ const AddProduct = () => {
     const [imgUrl, setImgUrl] = useState(""); // Initial image URL
     const [categories, setCategories] = useState([]); // Categories fetched from the backend
     const [imageFile, setImageFile] = useState(null); // State for selected image file
+    const [isSubmitting, setIsSubmitting] = useState(false); // State for handling form submission
     const navigate = useNavigate();
 
     // Fetch categories from the backend
@@ -55,55 +57,72 @@ const AddProduct = () => {
     }, []);
 
     // Handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+// Handle form submission
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple submissions
 
-        if (!categoryId) {
-            alert("❌ Please select a category.");
+    if (!categoryId) {
+        alert("❌ Please select a category.");
+        return;
+    }
+
+    setIsSubmitting(true);
+
+    let uploadedImageUrl = imgUrl; // Default to the initial image URL
+
+    if (imageFile) {
+        if (!imageFile.type.startsWith("image/")) {
+            alert("❌ Please select a valid image file.");
+            setIsSubmitting(false);
             return;
         }
 
-        let uploadedImageUrl = imgUrl;
-
-        if (imageFile) {
-            if (!imageFile.type.startsWith("image/")) {
-                alert("❌ Please select a valid image file.");
-                return;
-            }
-
-            uploadedImageUrl = await imageUpload(imageFile);
-            if (!uploadedImageUrl) {
-                alert("❌ Failed to upload the image.");
-                return;
-            }
+        // Call image upload function and get the uploaded URL
+        uploadedImageUrl = await imageUpload(imageFile);
+        if (!uploadedImageUrl) {
+            alert("❌ Failed to upload the image.");
+            setIsSubmitting(false);
+            return;
         }
+    }
 
-        const productData = {
-            itemId,
-            name,
-            categoryId,
-            quantity,
-            imgUrl: uploadedImageUrl,
-        };
+    if (!uploadedImageUrl) {
+        alert("❌ Image URL is missing!");
+        setIsSubmitting(false);
+        return;
+    }
 
-        try {
-            const response = await fetch("http://localhost:5000/api/create_product", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(productData),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to add product");
-            }
-
-            alert("✅ Product added successfully!");
-            navigate("/products");
-        } catch (error) {
-            console.error("Error:", error);
-            alert("❌ Failed to add product");
-        }
+    const productData = {
+        itemId,
+        name,
+        categoryId,
+        quantity,
+        imgUrl: uploadedImageUrl,  // Include the image URL that was uploaded
     };
+
+    try {
+        const response = await fetch("http://localhost:5000/api/create_product", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(productData),
+        });
+        console.log("Product added:", productData);
+
+        if (!response.ok) {
+            throw new Error("Failed to add product");
+        }
+
+        alert("✅ Product added successfully!");
+        // navigate("/products");  // Uncomment if you want to navigate after adding the product
+    } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Failed to add product");
+    } finally {
+        setIsSubmitting(false); 
+    }
+};
+
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-[url('../public/tiled_background.png')] bg-cover">
@@ -163,8 +182,9 @@ const AddProduct = () => {
                     <button
                         type="submit"
                         className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                        disabled={isSubmitting}
                     >
-                        Add Product
+                        {isSubmitting ? "Adding Product..." : "Add Product"}
                     </button>
                 </form>
             </div>

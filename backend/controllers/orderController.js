@@ -30,6 +30,28 @@ export const createOrder = async (req, res) => {
     }
 };
 
+
+export const getOrderByStatus = async (req, res) => {
+    try {
+        const status = decodeURIComponent(req.params.status); // ✅ Decode URL-encoded status
+        console.log("Searching for status:", status);
+
+        const orders = await Order.find({ status })
+            .populate("employeeId", "name")
+            .populate("departmentId", "name")
+            .populate("items.productId", "name");
+
+        if (!orders.length) {
+            return res.status(404).json({ message: "❌ No orders found" });
+        }
+
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: "❌ Error fetching orders", error: error.message });
+    }
+};
+
+
 /**
  * Get all orders
  */

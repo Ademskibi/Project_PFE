@@ -57,49 +57,39 @@ export const getAProduct = async (req, res) => {
 // 🔴 Create a Product (with Image Upload)
 export const createProduct = async (req, res) => {
   try {
-    const { itemId, name, categoryId, quantity } = req.body;
+    const { itemId, name, categoryId, quantity, imgUrl } = req.body; // Extract these fields from the body
 
+    // Check if required fields are provided
     if (!itemId || !name || !categoryId || !quantity) {
       return res.status(400).json({ message: "❌ All fields are required" });
     }
 
+    // Check if the product already exists
     const existingProduct = await Product.findOne({ itemId });
     if (existingProduct) {
       return res.status(400).json({ message: "❌ Product already exists" });
     }
 
+    // Check if the category exists
     const category = await Category.findById(categoryId);
     if (!category) {
       return res.status(400).json({ message: "❌ Category not found" });
     }
 
-    let imgUrl = null;
-    if (req.file) {
-      const result = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { resource_type: "image" },
-          (error, uploadedImage) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(uploadedImage.secure_url);
-            }
-          }
-        ).end(req.file.buffer);
-      });
-
-      imgUrl = result;
-    }
+    // If there's an image, upload it to Cloudinary
+    let imageUrl = imgUrl || null; // Default to null if no image URL is provided
 
     const newProduct = new Product({
       itemId,
       name,
       categoryId,
       quantity,
-      imgUrl,
+      imgUrl: imageUrl, // Save the image URL
     });
 
+    // Save the new product to the database
     await newProduct.save();
+
     res.status(201).json({ message: "✅ Product created successfully", product: newProduct });
   } catch (error) {
     res.status(500).json({ message: "❌ Error creating product", error: error.message });
@@ -135,7 +125,7 @@ export const deleteProduct = async (req, res) => {
 // 🟡 Get Products by Category
 export const getProductsByCategory = async (req, res) => {
   try {
-    const { categoryId } = req.body;
+    const { categoryId } = req.params; // ✅ Fix: Get categoryId from URL params
 
     if (!categoryId) {
       return res.status(400).json({ message: "❌ Category ID is required" });
@@ -147,10 +137,6 @@ export const getProductsByCategory = async (req, res) => {
     }
 
     const products = await Product.find({ categoryId });
-
-    if (products.length === 0) {
-      return res.status(404).json({ message: "❌ No products found for this category" });
-    }
 
     res.json({ category: category.name, products });
   } catch (error) {

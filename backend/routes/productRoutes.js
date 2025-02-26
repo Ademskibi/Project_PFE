@@ -7,5 +7,5 @@ router.get("/products", getAllProducts);
 router.post("/create_product", createProduct);
 router.get("/Product", getAProduct);
 router.post("/delete",deleteProduct);
-router.get("/Category",getProductsByCategory);
+router.get("/products/category/:categoryId", getProductsByCategory); 
 export default router;
