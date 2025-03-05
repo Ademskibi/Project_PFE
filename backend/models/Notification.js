@@ -4,6 +4,7 @@ const NotificationSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     message: { type: String, required: true },
     dateSent: { type: Date, default: Date.now },
+    order: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
     type: { 
         type: String, 
         enum: ["approve", "reject"], 
