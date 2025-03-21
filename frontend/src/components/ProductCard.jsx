@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import AddOrder from "./Addorder"; // Import AddOrder component
+import AddOrder from "./Addorder"; 
 
 const ProductCard = ({ product }) => {
     const { addToCart } = useCart();
     const [showAddOrder, setShowAddOrder] = useState(false);
+
 
     // Close modal handler
     const closeModal = () => setShowAddOrder(false);

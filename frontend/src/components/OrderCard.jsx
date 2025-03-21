@@ -24,7 +24,7 @@ const OrderCard = ({ order }) => {
             {order.items.map(item => (
                 <div key={item.productId?._id} className="flex items-center gap-4 mt-2">
                     <img
-                        src={item.productId?.image || "https://via.placeholder.com/100"}
+                        src={item.productId?.imgUrl || "https://via.placeholder.com/100"}
                         alt={item.productId?.name}
                         className="w-20 h-20 object-cover rounded"
                     />

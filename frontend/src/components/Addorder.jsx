@@ -1,15 +1,38 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Correct import
 
 const AddOrder = ({ item, onClose, onSubmit }) => {
   const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   const handleSubmit = () => {
-    if (onSubmit) {
-      onSubmit({ ...item, quantity });
-    }
+    if (!item || !item.productId) return;
+  
+    const newOrder = {
+      productId: item.productId._id,
+      name: item.productId.name,
+      imgUrl: item.productId.imgUrl,
+      quantity,
+    };
+  
+    // Retrieve existing cart from localStorage
+    const existingCart = JSON.parse(localStorage.getItem("cartOrders")) || [];
+  
+    // Add the new order
+    const updatedCart = [...existingCart, newOrder];
+  
+    // Save back to localStorage
+    localStorage.setItem("cartOrders", JSON.stringify(updatedCart));
+  
+    console.log("Updated Cart Orders:", updatedCart);
+   // navigate("/cart"); // Navigate to cart without overwriting
+   onClose(); 
   };
+  
 
-  if (!item || !item.productId) return <p className="text-gray-500 text-center">No product data available.</p>;
+  if (!item || !item.productId) {
+    return <p className="text-gray-500 text-center">No product data available.</p>;
+  }
 
   return (
     <div className="p-6 border rounded-lg bg-white shadow-md max-w-md mx-auto">
@@ -36,7 +59,10 @@ const AddOrder = ({ item, onClose, onSubmit }) => {
           type="number"
           placeholder="Quantity"
           value={quantity}
-          onChange={(e) => setQuantity(Math.max(1, Math.min(item.productId.quantity || 1, parseInt(e.target.value, 10))) || 1)}
+          onChange={(e) => {
+            const newValue = parseInt(e.target.value, 10);
+            setQuantity(isNaN(newValue) ? 1 : Math.max(1, Math.min(item.productId.quantity || 1, newValue)));
+          }}
           required
           max={item.productId.quantity || 1}
           min="1"
