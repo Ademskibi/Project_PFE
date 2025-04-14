@@ -1,4 +1,9 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearUser } from './redux/slices/userSlice';
+import { isTokenExpired } from './utils/tokenUtils';
+import { clearCart } from './redux/slices/cartSlice';
 import Login from './pages/Login/Login';
 import AddUser from './pages/admin/AddUser';
 import AddProduct from './pages/admin/AddProduct';
@@ -11,17 +16,35 @@ import Order from './components/Order';
 import Cart from './pages/Cart';
 
 function App() {
+  const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (user?._id) {
+        dispatch(clearCart(user._id));
+      }
+    }, 15 * 60 * 1000); // 15 minutes
+  
+    return () => clearTimeout(timeout); // Cleanup on unmount
+  }, [user, dispatch]);
+  
+
+  const ProtectedRoute = ({ element }) => {
+    return user ? element : <Navigate to="/" />;
+  };
+
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/AddUser" element={<AddUser />} />
-      <Route path="/AddProduct" element={<AddProduct />} />
-      <Route path="/Navbar" element={<Navbar />} />
-      <Route path="/ProductsPage" element={<ProductsPage />} />
-      <Route path="/Mainpage" element={<Mainpage />} />
-      <Route path="/AdminMain" element={<AdminMain />} />
-      <Route path="/Order" element={<Order />} />
-      <Route path="/Cart" element={<Cart />} />
+      <Route path="/AddUser" element={<ProtectedRoute element={<AddUser />} />} />
+      <Route path="/AddProduct" element={<ProtectedRoute element={<AddProduct />} />} />
+      <Route path="/Navbar" element={<ProtectedRoute element={<Navbar />} />} />
+      <Route path="/ProductsPage" element={<ProtectedRoute element={<ProductsPage />} />} />
+      <Route path="/Mainpage" element={<ProtectedRoute element={<Mainpage />} />} />
+      <Route path="/AdminMain" element={<ProtectedRoute element={<AdminMain />} />} />
+      <Route path="/Order" element={<ProtectedRoute element={<Order />} />} />
+      <Route path="/Cart" element={<ProtectedRoute element={<Cart />} />} />
     </Routes>
   );
 }

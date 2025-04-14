@@ -2,16 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { CartProvider } from "./context/CartContext"; // Adjust the import path
+import { Provider } from 'react-redux';
+import { store, persistor } from './redux/store'; // ✅ Import both store and persistor
+import { PersistGate } from 'redux-persist/integration/react';
 
-const root = ReactDOM.createRoot(document.getElementById("root")); // ✅ Use createRoot()
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-    <React.StrictMode>
+  <React.StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
-            <CartProvider>
-                <App />
-            </CartProvider>
+          <App />
         </BrowserRouter>
-    </React.StrictMode>
+      </PersistGate>
+    </Provider>
+  </React.StrictMode>
 );

@@ -3,7 +3,7 @@ import { createOrder, getAllOrders, getOrderById, updateOrderStatus, deleteOrder
 
 const router = express.Router();
 
-router.post("/orders", createOrder);
+router.post("/create-order", createOrder);
 router.get("/orders", getAllOrders); 
 router.get("/orders/:id", getOrderById); 
 router.put("/orders/:id/status", updateOrderStatus); 

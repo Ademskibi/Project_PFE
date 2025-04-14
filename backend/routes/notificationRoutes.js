@@ -1,4 +1,4 @@
-/*import express from 'express';
+import express from 'express';
 import { 
     createNotification, 
     getAllNotifications, 
@@ -15,4 +15,4 @@ router.get('/type/:type', getNotificationsByType);
 router.get('/:userId', getUserNotifications);
 router.delete('/notification/:id', deleteNotification); 
 
-export default router;*/
+export default router;

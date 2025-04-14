@@ -143,3 +143,35 @@ export const getProductsByCategory = async (req, res) => {
     res.status(500).json({ message: "❌ Error fetching products by category", error: error.message });
   }
 };
+// 🔵 Update Product Quantity
+export const updateProductQuantity = async (req, res) => {
+  try {
+    const { itemId, quantity, operator } = req.body;
+
+    if (!itemId || typeof quantity !== "number") {
+      return res.status(400).json({ message: "❌ itemId and numeric quantity are required" });
+    }
+
+    const product = await Product.findOne({ itemId });
+
+    if (!product) {
+      return res.status(404).json({ message: "❌ Product not found" });
+    }
+
+    // Update logic (increase/decrease)
+    if (operator === "decrease") {
+      if (product.quantity < quantity) {
+        return res.status(400).json({ message: "❌ Not enough quantity to decrease" });
+      }
+      product.quantity -= quantity;
+    } else {
+      product.quantity += quantity;
+    }
+
+    await product.save();
+
+    res.json({ message: "✅ Product quantity updated", product });
+  } catch (error) {
+    res.status(500).json({ message: "❌ Error updating quantity", error: error.message });
+  }
+};

@@ -8,7 +8,7 @@ export const createOrder = async (req, res) => {
     try {
         const { employeeId, departmentId, status, items } = req.body;
 
-        if (!employeeId || !departmentId || !status || !items || items.length === 0) {
+        if (!employeeId || !departmentId || !status || !items ) {
             return res.status(400).json({ message: "❌ All fields are required, including items." });
         }
 
