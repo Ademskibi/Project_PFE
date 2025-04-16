@@ -11,19 +11,20 @@ const Cart = () => {
   const userCart = useSelector(
     (state) => state.cart.itemsByUserId[user?._id] || []
   );
+
   console.log("🧑 Logged in user:", user);
 
   // ⏰ Activate timeout for cart expiration
   useCartTimeout(user?._id);
 
   const handleCheckout = async () => {
-    if (userCart.length === 0) {
-      alert("🛒 Your cart is empty!");
+    if (!user?._id) {
+      alert("⚠️ You must be logged in to place an order.");
       return;
     }
 
-    if (!user?._id) {
-      alert("⚠️ You must be logged in to place an order.");
+    if (userCart.length === 0) {
+      alert("🛒 Your cart is empty!");
       return;
     }
 
@@ -32,52 +33,65 @@ const Cart = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/create-order", {
+      const orderPayload = {
+        items: userCart,
+        employeeId: user._id,
+        departmentId: user.departmentId,
+        status: "Not approved yet",
+      };
+
+      console.log("🚀 Sending order data:", orderPayload);
+
+      const orderResponse = await fetch("http://localhost:5000/api/create-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          items: userCart,
-          employeeId: user._id,
-          departmentId: user.departmentId,
-          status: "Not approved yet",
-        }),
-
+        body: JSON.stringify(orderPayload),
       });
-      const response = await fetch("http://localhost:5000/api//products/update", {
-        method: "put",
+
+      const orderData = await orderResponse.json();
+
+      if (!orderResponse.ok) {
+        console.error("🚫 Order submission failed:", orderData.message);
+        alert(`Order failed: ${orderData.message || "Unknown error"}`);
+        return;
+      }
+
+      const updateResponse = await fetch("http://localhost:5000/api/products/update", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          items: userCart,
-        
+          updates: userCart.map((item) => ({
+            _id: item.productId,
+            operator: "decrease",
+            quantity: item.quantity,
+          })),
         }),
-        
       });
-
-      console.log("🚀 Sending order data:", {
-        items: userCart,
-        employeeId: user._id,
-        departmentId: user.departmentId,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("🚫 Order submission failed:", data.message);
-        alert(`Order failed: ${data.message || "Unknown error"}`);
+      
+      console.log(userCart)
+      if (!updateResponse.ok) {
+        const updateError = await updateResponse.json();
+        console.error("⚠️ Product update failed:", updateError.message);
+        alert(`Product update failed: ${updateError.message || "Unknown error"}`);
         return;
       }
-
-      console.log("✅ Order confirmed:", data);
+      console.log(userCart)
+      console.log("✅ Order confirmed:", orderData);
       dispatch(clearCart(user._id));
       navigate("/checkout");
     } catch (error) {
       console.error("🔥 Checkout error:", error);
       alert("An unexpected error occurred while placing the order.");
     }
+  };
+
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "/default-image.jpg";
   };
 
   return (
@@ -94,20 +108,14 @@ const Cart = () => {
               className="mb-4 border p-4 rounded shadow flex items-center space-x-4"
             >
               <img
-                src={order.imgUrl || "/default-image.jpg"} // Local fallback image
+                src={order.imgUrl || "/default-image.jpg"}
                 alt={order.name}
-                onError={(e) => {
-                  e.target.src = "/default-image.jpg"; // Fallback to a local image
-                }}
+                onError={handleImageError}
                 className="w-24 h-24 object-cover rounded-lg"
               />
               <div>
-                <p className="text-gray-800 text-xl font-semibold">
-                  {order.name}
-                </p>
-                <p className="text-gray-500 text-sm">
-                  Quantity: {order.quantity}
-                </p>
+                <p className="text-gray-800 text-xl font-semibold">{order.name}</p>
+                <p className="text-gray-500 text-sm">Quantity: {order.quantity}</p>
               </div>
             </div>
           ))}

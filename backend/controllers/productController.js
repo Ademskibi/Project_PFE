@@ -146,31 +146,41 @@ export const getProductsByCategory = async (req, res) => {
 // 🔵 Update Product Quantity
 export const updateProductQuantity = async (req, res) => {
   try {
-    const { itemId, quantity, operator } = req.body;
+    const { updates } = req.body;
 
-    if (!itemId || typeof quantity !== "number") {
-      return res.status(400).json({ message: "❌ itemId and numeric quantity are required" });
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return res.status(400).json({ message: "❌ 'updates' must be a non-empty array" });
     }
 
-    const product = await Product.findOne({ itemId });
+    const updatedProducts = [];
 
-    if (!product) {
-      return res.status(404).json({ message: "❌ Product not found" });
-    }
+    for (const update of updates) {
+      const { _id, quantity, operator } = update;
 
-    // Update logic (increase/decrease)
-    if (operator === "decrease") {
-      if (product.quantity < quantity) {
-        return res.status(400).json({ message: "❌ Not enough quantity to decrease" });
+      if (!_id || typeof quantity !== "number") {
+        return res.status(400).json({ message: "❌ _id and numeric quantity are required" });
       }
-      product.quantity -= quantity;
-    } else {
-      product.quantity += quantity;
+
+      const product = await Product.findById(_id);
+
+      if (!product) {
+        return res.status(404).json({ message: `❌ Product not found: ${_id}` });
+      }
+
+      if (operator === "decrease") {
+        if (product.quantity < quantity) {
+          return res.status(400).json({ message: `❌ Not enough quantity for product: ${product.name}` });
+        }
+        product.quantity -= quantity;
+      } else {
+        product.quantity += quantity;
+      }
+
+      await product.save();
+      updatedProducts.push(product);
     }
 
-    await product.save();
-
-    res.json({ message: "✅ Product quantity updated", product });
+    res.json({ message: "✅ Products updated", products: updatedProducts });
   } catch (error) {
     res.status(500).json({ message: "❌ Error updating quantity", error: error.message });
   }

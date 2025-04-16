@@ -9,6 +9,7 @@ const Order = () => {
             try {
                 const response = await fetch("http://localhost:5000/api/orders/status/Not approved yet");
                 const data = await response.json();
+                console.log(data)
                 setOrders(data); // Store fetched orders
             } catch (error) {
                 console.error("Error fetching orders:", error);
@@ -16,7 +17,7 @@ const Order = () => {
         };
         fetchOrders();
     }, []);
-
+    
     return (
         <div className="p-4">
             <h2 className="text-2xl font-bold mb-4">Pending Orders</h2>

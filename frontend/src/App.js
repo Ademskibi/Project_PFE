@@ -37,12 +37,12 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/AddUser" element={<ProtectedRoute element={<AddUser />} />} />
-      <Route path="/AddProduct" element={<ProtectedRoute element={<AddProduct />} />} />
+      <Route path="/Add_User" element={<ProtectedRoute element={<AddUser />} />} />
+      <Route path="/Add_Product" element={<ProtectedRoute element={<AddProduct />} />} />
       <Route path="/Navbar" element={<ProtectedRoute element={<Navbar />} />} />
-      <Route path="/ProductsPage" element={<ProtectedRoute element={<ProductsPage />} />} />
-      <Route path="/Mainpage" element={<ProtectedRoute element={<Mainpage />} />} />
-      <Route path="/AdminMain" element={<ProtectedRoute element={<AdminMain />} />} />
+      <Route path="/Products_Page" element={<ProtectedRoute element={<ProductsPage />} />} />
+      <Route path="/Main_page" element={<ProtectedRoute element={<Mainpage />} />} />
+      <Route path="/Admin_Main" element={<ProtectedRoute element={<AdminMain />} />} />
       <Route path="/Order" element={<ProtectedRoute element={<Order />} />} />
       <Route path="/Cart" element={<ProtectedRoute element={<Cart />} />} />
     </Routes>
