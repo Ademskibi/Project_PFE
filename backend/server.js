@@ -11,6 +11,7 @@ import productRoutes from "./routes/productRoutes.js";
 import departementRoutes from "./routes/departementRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js"
 import multer from "multer"; // Import multer for file uploads
 import fs from "fs"; // File system module for cleaning up temporary files
 import path from "path"; // Import path module for handling file paths
@@ -51,6 +52,7 @@ app.use("/api/", productRoutes);
 app.use("/api/", departementRoutes);
 app.use("/api/", orderRoutes);
 app.use("/api/", categoryRoutes);
+app.use("/api/", notificationRoutes);
 
 // Image upload route
 app.post("/api/upload", upload.single("image"), async (req, res) => {

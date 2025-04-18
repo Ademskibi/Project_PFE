@@ -28,18 +28,28 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+
+export const getAvailableProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ stock: { $gt: 0 } });
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
 // 🔵 Get Single Product by name or itemId
 export const getAProduct = async (req, res) => {
   try {
-    const { name, itemId } = req.body;
+    const { name, _id } = req.body;
 
-    if (!name && !itemId) {
-      return res.status(400).json({ message: "❌ Either name or itemId is required" });
+    if (!name && !_id) {
+      return res.status(400).json({ message: "❌ Either name or _id is required" });
     }
 
     let product;
-    if (itemId) {
-      product = await Product.findOne({ itemId }).populate("categoryId", "name");
+    if (_id) {
+      product = await Product.findById(_id).populate("categoryId", "name");
     } else {
       product = await Product.findOne({ name }).populate("categoryId", "name");
     }
@@ -54,13 +64,14 @@ export const getAProduct = async (req, res) => {
   }
 };
 
+
 // 🔴 Create a Product (with Image Upload)
 export const createProduct = async (req, res) => {
   try {
-    const { itemId, name, categoryId, quantity, imgUrl } = req.body; // Extract these fields from the body
+    const { itemId, name, categoryId, stock, imgUrl } = req.body; // Extract these fields from the body
 
     // Check if required fields are provided
-    if (!itemId || !name || !categoryId || !quantity) {
+    if (!itemId || !name || !categoryId || !stock) {
       return res.status(400).json({ message: "❌ All fields are required" });
     }
 
@@ -83,7 +94,7 @@ export const createProduct = async (req, res) => {
       itemId,
       name,
       categoryId,
-      quantity,
+      stock,
       imgUrl: imageUrl, // Save the image URL
     });
 
@@ -143,8 +154,9 @@ export const getProductsByCategory = async (req, res) => {
     res.status(500).json({ message: "❌ Error fetching products by category", error: error.message });
   }
 };
-// 🔵 Update Product Quantity
-export const updateProductQuantity = async (req, res) => {
+
+// 🔵 Update Product Stock
+export const updateProductStock = async (req, res) => {
   try {
     const { updates } = req.body;
 
@@ -155,10 +167,10 @@ export const updateProductQuantity = async (req, res) => {
     const updatedProducts = [];
 
     for (const update of updates) {
-      const { _id, quantity, operator } = update;
+      const { _id, stock, operator } = update;
 
-      if (!_id || typeof quantity !== "number") {
-        return res.status(400).json({ message: "❌ _id and numeric quantity are required" });
+      if (!_id || typeof stock !== "number") {
+        return res.status(400).json({ message: "❌ _id and numeric stock are required" });
       }
 
       const product = await Product.findById(_id);
@@ -168,12 +180,12 @@ export const updateProductQuantity = async (req, res) => {
       }
 
       if (operator === "decrease") {
-        if (product.quantity < quantity) {
-          return res.status(400).json({ message: `❌ Not enough quantity for product: ${product.name}` });
+        if (product.stock < stock) {
+          return res.status(400).json({ message: `❌ Not enough stock for product: ${product.name}` });
         }
-        product.quantity -= quantity;
+        product.stock -= stock;
       } else {
-        product.quantity += quantity;
+        product.stock += stock;
       }
 
       await product.save();
@@ -182,6 +194,6 @@ export const updateProductQuantity = async (req, res) => {
 
     res.json({ message: "✅ Products updated", products: updatedProducts });
   } catch (error) {
-    res.status(500).json({ message: "❌ Error updating quantity", error: error.message });
+    res.status(500).json({ message: "❌ Error updating stock", error: error.message });
   }
 };

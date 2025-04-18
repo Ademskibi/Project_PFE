@@ -14,7 +14,8 @@ import Mainpage from './pages/emplyee/Mainpage';
 import AdminMain from './pages/admin/AdminMain';
 import Order from './components/Order';
 import Cart from './pages/Cart';
-
+import Orderlist from './components/Orderlist';
+import Mangeorder from './pages/storekeeper/Mangeorder';
 function App() {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -43,8 +44,10 @@ function App() {
       <Route path="/Products_Page" element={<ProtectedRoute element={<ProductsPage />} />} />
       <Route path="/Main_page" element={<ProtectedRoute element={<Mainpage />} />} />
       <Route path="/Admin_Main" element={<ProtectedRoute element={<AdminMain />} />} />
-      <Route path="/Order" element={<ProtectedRoute element={<Order />} />} />
+      <Route path="/Orders" element={<ProtectedRoute element={<Order />} />} />
       <Route path="/Cart" element={<ProtectedRoute element={<Cart />} />} />
+      <Route path="/Order_list" element={<ProtectedRoute element={<Orderlist />} />} />
+      <Route path="/Manage_order" element={<ProtectedRoute element={<Mangeorder />} />} />
     </Routes>
   );
 }

@@ -1,6 +1,7 @@
 import React from "react";
+import Navbar from "../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCart } from "../redux/slices/cartSlice";
+import { clearCart, removeFromCart } from "../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
 import useCartTimeout from "../hooks/useCartTimeout";
 
@@ -14,7 +15,7 @@ const Cart = () => {
 
   console.log("🧑 Logged in user:", user);
 
-  // ⏰ Activate timeout for cart expiration
+  // ⏰ Cart auto-expiration
   useCartTimeout(user?._id);
 
   const handleCheckout = async () => {
@@ -67,26 +68,30 @@ const Cart = () => {
           updates: userCart.map((item) => ({
             _id: item.productId,
             operator: "decrease",
-            quantity: item.quantity,
+            stock: item.quantity,
           })),
         }),
       });
-      
-      console.log(userCart)
+
       if (!updateResponse.ok) {
         const updateError = await updateResponse.json();
         console.error("⚠️ Product update failed:", updateError.message);
         alert(`Product update failed: ${updateError.message || "Unknown error"}`);
         return;
       }
-      console.log(userCart)
+
       console.log("✅ Order confirmed:", orderData);
       dispatch(clearCart(user._id));
-      navigate("/checkout");
+      navigate("/Main_Page");
     } catch (error) {
       console.error("🔥 Checkout error:", error);
       alert("An unexpected error occurred while placing the order.");
     }
+  };
+
+  const handleRemoveItem = (productId) => {
+    if (!user?._id) return;
+    dispatch(removeFromCart({ userId: user._id, productId }));
   };
 
   const handleImageError = (e) => {
@@ -95,9 +100,12 @@ const Cart = () => {
   };
 
   return (
-    <div className="p-6 border rounded-lg bg-white shadow-md max-w-md mx-auto mt-10">
+    <div>
+      <Navbar />
+        <div className="p-6 border rounded-lg bg-white shadow-md max-w-md mx-auto mt-10">
+      
       <h2 className="text-2xl font-semibold mb-6 text-center">🛒 Cart</h2>
-
+      
       {userCart.length === 0 ? (
         <p className="text-gray-500 text-center">Your cart is empty.</p>
       ) : (
@@ -113,10 +121,17 @@ const Cart = () => {
                 onError={handleImageError}
                 className="w-24 h-24 object-cover rounded-lg"
               />
-              <div>
-                <p className="text-gray-800 text-xl font-semibold">{order.name}</p>
+              <div className="flex-1">
+                <p className="text-gray-800 text-lg font-semibold">{order.name}</p>
                 <p className="text-gray-500 text-sm">Quantity: {order.quantity}</p>
               </div>
+              <button
+                onClick={() => handleRemoveItem(order.productId)}
+                className="text-red-500 hover:text-red-700 font-bold text-xl"
+                title="Remove from cart"
+              >
+                ✕
+              </button>
             </div>
           ))}
 
@@ -137,6 +152,9 @@ const Cart = () => {
         </>
       )}
     </div>
+    </div>
+    
+  
   );
 };
 

@@ -8,8 +8,7 @@ const AddOrder = ({ item, onClose }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const [quantity, setQuantity] = useState(1);
-  console.log("User in AddOrder:", user); 
-  console.log("Item in AddOrder:", item.productId);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -32,11 +31,8 @@ const AddOrder = ({ item, onClose }) => {
 
   const handleQuantityChange = (e) => {
     const newValue = parseInt(e.target.value, 10);
-    setQuantity(
-      isNaN(newValue)
-        ? 1
-        : Math.max(1, Math.min(item.productId.quantity || 1, newValue))
-    );
+    const maxStock = item.productId.stock || 1;
+    setQuantity(isNaN(newValue) ? 1 : Math.max(1, Math.min(maxStock, newValue)));
   };
 
   if (!item || !item.productId) {
@@ -56,7 +52,7 @@ const AddOrder = ({ item, onClose }) => {
           <div>
             <p className="text-gray-800 text-xl font-semibold">{item.productId.name}</p>
             <p className="text-gray-500 text-sm">
-              Available: {item.productId.quantity || 0} units
+              Available: {item.productId.stock || 0} units
             </p>
           </div>
         </div>
@@ -72,7 +68,7 @@ const AddOrder = ({ item, onClose }) => {
             value={quantity}
             onChange={handleQuantityChange}
             required
-            max={item.productId.quantity || 1}
+            max={item.productId.stock || 1}
             min="1"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
@@ -85,7 +81,6 @@ const AddOrder = ({ item, onClose }) => {
             >
               Cancel
             </button>
-
             <button
               type="submit"
               className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"

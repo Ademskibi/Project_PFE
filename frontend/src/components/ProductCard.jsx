@@ -4,48 +4,54 @@ import { addToCart } from "../redux/slices/cartSlice";
 import AddOrder from "./Addorder";
 
 const ProductCard = ({ product }) => {
-  const dispatch = useDispatch(); // ✅ Redux hook
+  const dispatch = useDispatch();
   const [showAddOrder, setShowAddOrder] = useState(false);
-  console.log("Product in  :", product); // Debugging line
-  // Close modal handler
+
   const closeModal = () => setShowAddOrder(false);
 
-  // Optional: Add directly without quantity (not used here, but ready if needed)
   const handleAddToCart = () => {
     dispatch(
       addToCart({
         _id: product._id,
         name: product.name,
         imgUrl: product.imgUrl,
-        quantity: 1,
+        stock: 1,
       })
     );
   };
-  console.log("Product in ProductCard:", product._id); 
+
   return (
     <div className="border p-4 rounded shadow-md">
       {/* Product Image */}
       <img
-        src={product.imgUrl}
+        src={product.imgUrl || "/default-image.jpg"}
         alt={product.name}
+        onError={(e) => {
+          e.target.src = "/default-image.jpg";
+        }}
         className="w-full h-40 object-cover rounded"
       />
 
       {/* Product Name */}
-      <h3 className="text-lg font-semibold">{product.name}</h3>
+      <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
 
       {/* Available Quantity */}
-      <p className="text-gray-600">Available Quantity: {product.quantity}</p>
+      <p className="text-gray-600">Available Stock: {product.stock}</p>
 
       {/* Add to Order Button */}
       <button
         onClick={() => setShowAddOrder(true)}
-        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
+        className={`mt-2 px-4 py-2 rounded w-full text-white transition ${
+          product.stock === 0
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-500 hover:bg-blue-600"
+        }`}
+        disabled={product.stock === 0}
       >
-        Add to Order
+        {product.stock === 0 ? "Out of Stock" : "Add to Order"}
       </button>
 
-      {/* Modal Structure */}
+      {/* Modal for AddOrder */}
       {showAddOrder && (
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto"
@@ -59,7 +65,7 @@ const ProductCard = ({ product }) => {
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
               aria-label="Close"
             >
-              X
+              ✕
             </button>
 
             {/* AddOrder Component */}

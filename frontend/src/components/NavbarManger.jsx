@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 
-const Navbar = () => {
+const NavbarManger = () => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
-  const user = useSelector((state) => state.user.user);
 
+  // Toggle Notifications Dropdown
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
   };
 
+  // Logout Function (Using Axios Instead of Fetch)
   const logout = async () => {
     try {
       await axios.post(
@@ -24,6 +24,7 @@ const Navbar = () => {
         }
       );
 
+      // Clear token and redirect to login page
       localStorage.removeItem("token");
       navigate("/");
     } catch (error) {
@@ -32,6 +33,7 @@ const Navbar = () => {
     }
   };
 
+  // Close Notifications When Clicking Outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -46,25 +48,26 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    if (!user?._id) return;
-
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/notification/${user._id}`);
-        setNotifications(response.data.notifications || []);
+        const response = await axios.get("/notifications", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        setNotifications(response.data.notifications);
       } catch (error) {
         console.error("Error fetching notifications", error);
       }
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // every 10s
+    const interval = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
 
     return () => clearInterval(interval);
-  }, [user?._id]);
+  }, []);
 
   return (
     <nav className="flex justify-between items-center p-4 bg-gray-800 text-white relative">
+      {/* Logo or Title */}
       <h2 className="text-2xl font-semibold">Supplies Inventory</h2>
 
       <div className="flex items-center space-x-6 relative">
@@ -94,7 +97,7 @@ const Navbar = () => {
           </svg>
         </button>
         <button
-  onClick={() => navigate("/Order_list")}
+  onClick={() => navigate("/orders")}
   className="bg-green-600 text-white p-2 rounded-md hover:bg-green-500"
 >
   <svg
@@ -112,7 +115,6 @@ const Navbar = () => {
     />
   </svg>
 </button>
-
 
         {/* Cart Button */}
         <button
@@ -210,4 +212,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarManger;

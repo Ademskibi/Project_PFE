@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from "react";
-import OrderCard from "./OrderCard";
-import NavbarManger from "./NavbarManger";
+import OrderCard from "./OrderCard.jsx";
 
-const Order = () => {
+const Mangeorder = () => {
   const [orders, setOrders] = useState([]);
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/orders/status/Not approved yet");
+      const response = await fetch("http://localhost:5000/api/orders/status/Approved");
       const data = await response.json();
 
       if (Array.isArray(data)) {
         setOrders(data);
       } else {
         console.warn("Expected array but got:", data);
-        setOrders([]); // Set to empty array to avoid map error
+        setOrders([]);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
-      setOrders([]); // Ensure fallback on error
+      setOrders([]);
     }
   };
 
@@ -27,12 +26,10 @@ const Order = () => {
   }, []);
 
   return (
-    <div>
-        <NavbarManger />
-      <h2 className="text-2xl font-bold mb-4">Pending Orders</h2>
-
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Storekeeper</h2>
       {orders.length === 0 ? (
-        <p>No pending orders.</p>
+        <p>No approved orders.</p>
       ) : (
         orders.map((order) => (
           <OrderCard key={order._id} order={order} onOrderAction={fetchOrders} />
@@ -42,4 +39,4 @@ const Order = () => {
   );
 };
 
-export default Order;
+export default Mangeorder;

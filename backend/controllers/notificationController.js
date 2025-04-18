@@ -5,7 +5,7 @@ import User from "../models/User.js";
 // 📌 Create a new notification
 export const createNotification = async (req, res) => {
     try {
-        const { userId, message, type } = req.body;
+        const { userId, message, type,order } = req.body;
 
         if (!userId || !message || !["approve", "reject"].includes(type)) {
             return res.status(400).json({ success: false, message: "❌ Invalid input. Type must be 'approve' or 'reject'." });
@@ -16,13 +16,14 @@ export const createNotification = async (req, res) => {
             return res.status(404).json({ success: false, message: "❌ User not found" });
         }
 
-        const newNotification = new Notification({ userId, message, type });
+        const newNotification = new Notification({ userId, message, type,order });
         await newNotification.save();
 
         res.status(201).json({ success: true, message: "✅ Notification created successfully", notification: newNotification });
     } catch (error) {
         res.status(500).json({ success: false, message: "❌ Failed to create notification", error: error.message });
     }
+
 };
 
 // 📌 Get all notifications

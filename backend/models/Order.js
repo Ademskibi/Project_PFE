@@ -10,7 +10,7 @@ const OrderSchema = new mongoose.Schema(
     departmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Department", required: true },
     status: {
       type: String,
-      enum: ["Ready to pick up", "Not approved yet", "Rejected", "Not ready","Delivered"],
+      enum: ["Ready to pick up", "Not approved yet", "Declined", "Approved","Not ready","Waiting list"],
       required: true,
     },
     items: [

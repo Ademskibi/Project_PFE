@@ -52,9 +52,7 @@ export const getOrderByStatus = async (req, res) => {
 };
 
 
-/**
- * Get all orders
- */
+
 export const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
@@ -75,20 +73,20 @@ export const getAllOrders = async (req, res) => {
 /**
  * Get order by ID
  */
-export const getOrderById = async (req, res) => {
+export const getOrdersByEmployeeId = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id)
+        const orders = await Order.find({ employeeId: req.params.employeeId })
             .populate("employeeId", "name")
             .populate("departmentId", "name")
             .populate("items.productId", "name");
 
-        if (!order) {
-            return res.status(404).json({ message: "❌ Order not found" });
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: "❌ No orders found for this employee" });
         }
 
-        res.json(order);
+        res.json(orders);
     } catch (error) {
-        res.status(500).json({ message: "❌ Error fetching order", error: error.message });
+        res.status(500).json({ message: "❌ Error fetching orders", error: error.message });
     }
 };
 
@@ -129,5 +127,87 @@ export const deleteOrder = async (req, res) => {
         res.json({ message: "✅ Order deleted successfully!" });
     } catch (error) {
         res.status(500).json({ message: "❌ Error deleting order", error: error.message });
+    }
+};
+export const Create_Waiting_List_Order = async (req, res) => {
+    try {
+        const { orderId, productId } = req.params;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: "❌ Order not found" });
+        }
+
+        // Find the ordered item
+        const item = order.items.find(
+            i => i.productId.toString() === productId
+        );
+
+        if (!item) {
+            return res.status(404).json({ message: "❌ Item not found in order" });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "❌ Product not found" });
+        }
+
+        
+
+        const waitingQty = item.quantity;
+
+        const waitingOrder = new Order({
+            employeeId: order.employeeId,
+            departmentId: order.departmentId,
+            status: "Waiting list",
+            items: [
+                {
+                    productId: productId,
+                    quantity: waitingQty,
+                }
+            ]
+        });
+
+        await waitingOrder.save();
+
+        res.status(201).json({
+            message: "✅ Over-ordered item detected and waiting list order created",
+            originalItem: item,
+            waitingOrder
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "❌ Server error", error: error.message });
+    }
+};
+export const remove_Order_Item = async (req, res) => {
+    try {
+        const { orderId, productId } = req.params;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: "❌ Order not found" });
+        }
+
+        const originalLength = order.items.length;
+
+        // Remove item
+        order.items = order.items.filter(
+            (item) => item.productId.toString() !== productId
+        );
+
+        if (order.items.length === originalLength) {
+            return res.status(404).json({ message: "❌ Item not found in the order" });
+        }
+
+        await order.save();
+
+        res.status(200).json({
+            message: "✅ Item removed from order successfully!",
+            order
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "❌ Error removing item from order", error: error.message });
     }
 };

@@ -31,7 +31,7 @@ const AddProduct = () => {
     const [itemId, setItemId] = useState("");
     const [name, setName] = useState("");
     const [categoryId, setCategoryId] = useState("");
-    const [quantity, setQuantity] = useState("");
+    const [stock, setStock] = useState(""); // Changed from quantity to stock
     const [imgUrl, setImgUrl] = useState(""); // Initial image URL
     const [categories, setCategories] = useState([]); // Categories fetched from the backend
     const [imageFile, setImageFile] = useState(null); // State for selected image file
@@ -57,72 +57,70 @@ const AddProduct = () => {
     }, []);
 
     // Handle form submission
-// Handle form submission
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (isSubmitting) return; // Prevent multiple submissions
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return; // Prevent multiple submissions
 
-    if (!categoryId) {
-        alert("❌ Please select a category.");
-        return;
-    }
-
-    setIsSubmitting(true);
-
-    let uploadedImageUrl = imgUrl; // Default to the initial image URL
-
-    if (imageFile) {
-        if (!imageFile.type.startsWith("image/")) {
-            alert("❌ Please select a valid image file.");
-            setIsSubmitting(false);
+        if (!categoryId) {
+            alert("❌ Please select a category.");
             return;
         }
 
-        // Call image upload function and get the uploaded URL
-        uploadedImageUrl = await imageUpload(imageFile);
+        setIsSubmitting(true);
+
+        let uploadedImageUrl = imgUrl; // Default to the initial image URL
+
+        if (imageFile) {
+            if (!imageFile.type.startsWith("image/")) {
+                alert("❌ Please select a valid image file.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Call image upload function and get the uploaded URL
+            uploadedImageUrl = await imageUpload(imageFile);
+            if (!uploadedImageUrl) {
+                alert("❌ Failed to upload the image.");
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
         if (!uploadedImageUrl) {
-            alert("❌ Failed to upload the image.");
+            alert("❌ Image URL is missing!");
             setIsSubmitting(false);
             return;
         }
-    }
 
-    if (!uploadedImageUrl) {
-        alert("❌ Image URL is missing!");
-        setIsSubmitting(false);
-        return;
-    }
+        const productData = {
+            itemId,
+            name,
+            categoryId,
+            stock, // Changed from quantity to stock
+            imgUrl: uploadedImageUrl, // Include the image URL that was uploaded
+        };
 
-    const productData = {
-        itemId,
-        name,
-        categoryId,
-        quantity,
-        imgUrl: uploadedImageUrl,  // Include the image URL that was uploaded
-    };
+        try {
+            const response = await fetch("http://localhost:5000/api/create_product", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(productData),
+            });
+            console.log("Product added:", productData);
 
-    try {
-        const response = await fetch("http://localhost:5000/api/create_product", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(productData),
-        });
-        console.log("Product added:", productData);
+            if (!response.ok) {
+                throw new Error("Failed to add product");
+            }
 
-        if (!response.ok) {
-            throw new Error("Failed to add product");
+            alert("✅ Product added successfully!");
+            // navigate("/products");  // Uncomment if you want to navigate after adding the product
+        } catch (error) {
+            console.error("Error:", error);
+            alert("❌ Failed to add product");
+        } finally {
+            setIsSubmitting(false);
         }
-
-        alert("✅ Product added successfully!");
-        // navigate("/products");  // Uncomment if you want to navigate after adding the product
-    } catch (error) {
-        console.error("Error:", error);
-        alert("❌ Failed to add product");
-    } finally {
-        setIsSubmitting(false); 
-    }
-};
-
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-[url('../public/tiled_background.png')] bg-cover">
@@ -166,9 +164,9 @@ const handleSubmit = async (e) => {
                     </select>
                     <input
                         type="number"
-                        placeholder="Quantity"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
+                        placeholder="Stock" // Changed from Quantity to Stock
+                        value={stock} // Changed from quantity to stock
+                        onChange={(e) => setStock(e.target.value)} // Changed from setQuantity to setStock
                         required
                         min="0"
                         className="w-full px-4 py-2 border rounded-lg"

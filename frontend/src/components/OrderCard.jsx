@@ -1,6 +1,6 @@
 import React from "react";
 
-const OrderCard = ({ order }) => {
+const OrderCard = ({ order, onOrderAction }) => {
     const handleUpdateStatus = async (orderId, newStatus) => {
         try {
             // 1. Update order status
@@ -10,11 +10,12 @@ const OrderCard = ({ order }) => {
                 body: JSON.stringify({ status: newStatus }),
             });
 
-            if (response.ok) {
-                console.log(`✅ Order ${orderId} updated to ${newStatus}`);
-            } else {
+            if (!response.ok) {
                 console.error("❌ Failed to update order status");
+                return;
             }
+
+            console.log(`✅ Order ${orderId} updated to ${newStatus}`);
 
             // 2. If declined, return products back to stock
             if (newStatus === "Declined") {
@@ -26,8 +27,8 @@ const OrderCard = ({ order }) => {
                     body: JSON.stringify({
                         updates: order.items.map((item) => ({
                             _id: item.productId._id,
-                            operator: "", // Optional: set to "increase" if logic expects it
-                            quantity: item.quantity,
+                            operator: "", // Optional: adjust as needed for your backend
+                            stock: item.quantity,
                         })),
                     }),
                 });
@@ -40,6 +41,35 @@ const OrderCard = ({ order }) => {
                     console.log("🔁 Product quantities restored after decline");
                 }
             }
+
+            // 3. Create a notification
+            const notificationMessage = newStatus === "Approved"
+                ? "Your order has been approved ✅"
+                : "Your order was declined ❌";
+            console.log("📨 Sending notification:", notificationMessage);
+            console.log(order);
+            const notifyRes = await fetch("http://localhost:5000/api/create_notification", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    userId: order.employeeId?._id,
+                    message: notificationMessage,
+                    type: newStatus.toLowerCase(),
+                    order: order._id,
+                }),
+            });
+
+            if (!notifyRes.ok) {
+                console.error("⚠️ Failed to send notification");
+            } else {
+                console.log("📨 Notification sent");
+            }
+
+            // 4. Refresh order list in parent
+            if (onOrderAction) onOrderAction();
+
         } catch (error) {
             console.error("🔥 Error updating order status:", error);
         }
