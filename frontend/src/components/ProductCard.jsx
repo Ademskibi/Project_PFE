@@ -21,7 +21,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="border p-4 rounded shadow-md">
+    <div className="bg-white border border-gray-200 p-5 rounded-2xl shadow-md transition hover:shadow-lg flex flex-col">
       {/* Product Image */}
       <img
         src={product.imgUrl || "/default-image.jpg"}
@@ -29,22 +29,22 @@ const ProductCard = ({ product }) => {
         onError={(e) => {
           e.target.src = "/default-image.jpg";
         }}
-        className="w-full h-40 object-cover rounded"
+        className="w-full h-40 object-cover rounded-xl mb-3 border border-gray-100"
       />
 
       {/* Product Name */}
-      <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+      <h3 className="text-xl font-semibold text-gray-800 mb-1">{product.name}</h3>
 
       {/* Available Quantity */}
-      <p className="text-gray-600">Available Stock: {product.stock}</p>
+      <p className="text-gray-500 text-sm mb-4">In Stock: {product.stock}</p>
 
       {/* Add to Order Button */}
       <button
         onClick={() => setShowAddOrder(true)}
-        className={`mt-2 px-4 py-2 rounded w-full text-white transition ${
+        className={`mt-auto py-2 px-4 rounded-2xl text-white font-medium transition duration-200 ${
           product.stock === 0
             ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-500 hover:bg-blue-600"
+            : "bg-blue-600 hover:bg-blue-500"
         }`}
         disabled={product.stock === 0}
       >
@@ -54,18 +54,18 @@ const ProductCard = ({ product }) => {
       {/* Modal for AddOrder */}
       {showAddOrder && (
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto"
+          className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
           aria-modal="true"
           role="dialog"
         >
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full relative">
             {/* Close Button */}
             <button
               onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
               aria-label="Close"
             >
-              ✕
+              ×
             </button>
 
             {/* AddOrder Component */}
