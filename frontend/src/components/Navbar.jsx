@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
+import { clearUser } from "../redux/slices/userSlice";
 const Navbar = () => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
   const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
@@ -24,6 +25,7 @@ const Navbar = () => {
         }
       );
       localStorage.removeItem("token");
+      dispatch(clearUser()); // ✅ clear Redux state
       navigate("/");
     } catch (error) {
       console.error("Error logging out", error);
@@ -68,7 +70,7 @@ const Navbar = () => {
 
       <div className="flex items-center gap-4 relative">
         <button
-          onClick={() => navigate("/Main_Page")}
+          onClick={() => navigate("/home")}
           className="p-2 rounded hover:bg-gray-100 transition"
           title="Home"
         >

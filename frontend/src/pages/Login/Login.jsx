@@ -1,22 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
-import { setUser } from '../../redux/slices/userSlice.js';
-import { clearCart } from '../../redux/slices/cartSlice.js';
+import { setUser } from '../../redux/slices/userSlice';
+import { clearCart } from '../../redux/slices/cartSlice';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        switch (user.role) {
+          case 'administrator':
+            navigate('/Admin_Main');
+            break;
+          case 'manager':
+            navigate('/Orders');
+            break;
+          case 'employee':
+            navigate('/Main_page');
+            break;
+          case 'storekeeper':
+            navigate('/Manage_order');
+            break;
+          default:
+            navigate('/Not_allowed');
+        }
+      }, 100);
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!email || !password) {
       setError('❌ Please fill in all fields.');
       return;
@@ -39,75 +64,79 @@ const Login = () => {
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
+      if (!response.ok) throw new Error(data.message || 'Login failed');
 
       const token = data.token;
       localStorage.setItem('token', token);
       const decodedUser = jwt_decode(token);
-      dispatch(setUser(decodedUser));
+
+      dispatch(setUser({ user: decodedUser, token }));
       dispatch(clearCart(decodedUser._id));
-      navigate('/Main_page');
       setEmail('');
       setPassword('');
     } catch (error) {
-      console.error("Login error:", error);
-      setError(error.message || "An unexpected error occurred.");
+      setError(error.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
-      <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md relative">
-        <h2 className="text-4xl font-bold text-center text-gray-800 mb-8">Welcome Back 👋</h2>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100">
+      <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md transition-all duration-300">
+        <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
+          Welcome Back 👋
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="text-sm font-medium text-gray-600">Email address</label>
             <input
               type="email"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+
+          <div className="relative">
+            <label className="text-sm font-medium text-gray-600">Password</label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
+            <div
+              className="absolute right-3 top-9 text-gray-500 hover:text-gray-800 cursor-pointer"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </div>
           </div>
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Forgot your password?{' '}
-              <Link to="/forgot-password" className="text-blue-500 hover:underline">
-                Reset it
-              </Link>
-            </p>
+          {error && <p className="text-red-600 text-center text-sm">{error}</p>}
+
+          <div className="text-sm text-center text-gray-500">
+            Forgot password?{' '}
+            <Link to="/forgot-password" className="text-blue-600 font-medium hover:underline">
+              Reset here
+            </Link>
           </div>
+
+          <button
+            type="submit"
+            disabled={loading || password.trim() === ''}
+            className={`w-full py-3 font-semibold text-white rounded-xl transition-all duration-300 ${
+              password.trim() === ''
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            } ${loading ? 'cursor-wait' : ''}`}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
-
-        <button
-          onClick={handleSubmit}
-          disabled={loading || password.trim() === ''}
-          className={`mt-6 w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 ${
-            password.trim() === ''
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
-          } ${loading ? 'cursor-wait' : ''}`}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
       </div>
     </div>
   );

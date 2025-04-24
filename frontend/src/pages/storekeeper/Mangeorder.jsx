@@ -8,7 +8,7 @@ const Mangeorder = () => {
     try {
       const response = await fetch("http://localhost:5000/api/orders/status/Approved");
       const data = await response.json();
-
+      console.log(data);
       if (Array.isArray(data)) {
         setOrders(data);
       } else {
@@ -24,6 +24,7 @@ const Mangeorder = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
 
   return (
     <div className="p-6">

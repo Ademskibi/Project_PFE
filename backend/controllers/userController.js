@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Department from "../models/Department.js";
 import bcrypt from "bcryptjs";
 
+// ✅ Fetch all users
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().populate("departmentId", "name");
@@ -11,7 +12,7 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-
+// ✅ Create a new user
 export const createUser = async (req, res) => {
   try {
     const { userId, name, email, password, departmentId, role } = req.body;
@@ -20,7 +21,6 @@ export const createUser = async (req, res) => {
     if (!userId || !name || !email || !password || !role || !departmentId) {
       return res.status(400).json({ message: "❌ All fields are required" });
     }
-
 
     // ✅ Check if the user already exists
     const existingUser = await User.findOne({ email });
@@ -44,7 +44,7 @@ export const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       departmentId,
-      role
+      role,
     });
 
     await newUser.save();
@@ -56,22 +56,15 @@ export const createUser = async (req, res) => {
   }
 };
 
-
+// ✅ Delete a user
 export const deleteUser = async (req, res) => {
   try {
-    const { userId, id } = req.body;
-
-    if (!userId && !id) {
-      return res.status(400).json({ message: "❌ Either userId or id is required" });
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: "❌ userId is required" });
     }
 
-    let deletedUser;
-    if (id) {
-      deletedUser = await User.findByIdAndDelete(id);
-    } else {
-      deletedUser = await User.findOneAndDelete({ userId });
-    }
-
+    const deletedUser = await User.findOneAndDelete({ userId });
     if (!deletedUser) {
       return res.status(404).json({ message: "❌ User not found" });
     }
@@ -82,22 +75,13 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// ✅ UPDATE USER FUNCTION
+// ✅ Update user details
 export const updateUser = async (req, res) => {
   try {
-    const { userId, id, name, email, password, departmentName, role } = req.body;
+    const { userId, name, email, password, role, departmentId } = req.body;
 
-    if (!userId && !id) {
-      return res.status(400).json({ message: "❌ Either userId or id is required" });
-    }
-
-    let user;
-    if (id) {
-      user = await User.findById(id);
-    } else {
-      user = await User.findOne({ userId });
-    }
-
+    // Ensure either userId or id is provided
+    let user = await User.findOne({ userId });
     if (!user) {
       return res.status(404).json({ message: "❌ User not found" });
     }
@@ -106,9 +90,8 @@ export const updateUser = async (req, res) => {
     if (email) user.email = email;
     if (password) user.password = await bcrypt.hash(password, 10);
     if (role) user.role = role;
-
-    if (departmentName) {
-      const department = await Department.findOne({ name: departmentName });
+    if (departmentId) {
+      const department = await Department.findById(departmentId);
       if (!department) {
         return res.status(400).json({ message: "❌ Department not found" });
       }
@@ -117,26 +100,29 @@ export const updateUser = async (req, res) => {
 
     await user.save();
     res.json({ message: "✅ User updated successfully", user });
+
   } catch (error) {
     res.status(500).json({ message: "❌ Error updating user", error: error.message });
   }
 };
+
+// ✅ Get users by role
 export const getUsersByRole = async (req, res) => {
-    try {
-      const { role } = req.body;
-  
-      if (!role) {
-        return res.status(400).json({ message: "❌ Role is required" });
-      }
-  
-      const users = await User.find({ role }).populate("departmentId", "name");
-  
-      if (users.length === 0) {
-        return res.status(404).json({ message: "❌ No users found for this role" });
-      }
-  
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: "❌ Error fetching users by role", error: error.message });
+  try {
+    const { role } = req.body;
+
+    if (!role) {
+      return res.status(400).json({ message: "❌ Role is required" });
     }
-  };
+
+    const users = await User.find({ role }).populate("departmentId", "name");
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "❌ No users found for this role" });
+    }
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "❌ Error fetching users by role", error: error.message });
+  }
+};

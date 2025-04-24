@@ -27,8 +27,8 @@ const AdminMain = () => {
             onChange={handleNavigation} // Trigger navigation on change
           >
             <option value="">Select Action</option>
-            <option value="/AddUser">Add New User</option>
-            <option value="/AddProduct">Add New Product</option>
+            <option value="/Add_User">Add New User</option>
+            <option value="/Add_Product">Add New Product</option>
           </select>
         </div>
       </div>
