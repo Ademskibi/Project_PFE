@@ -126,3 +126,22 @@ export const getUsersByRole = async (req, res) => {
     res.status(500).json({ message: "❌ Error fetching users by role", error: error.message });
   }
 };
+export const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ message: "❌ userId is required" });
+    }
+
+    const user = await User.findOne({ userId }).populate("departmentId", "name");
+
+    if (!user) {
+      return res.status(404).json({ message: "❌ User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "❌ Error fetching user", error: error.message });
+  }
+};

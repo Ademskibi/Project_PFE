@@ -15,7 +15,7 @@ import notificationRoutes from "./routes/notificationRoutes.js"
 import multer from "multer"; // Import multer for file uploads
 import fs from "fs"; // File system module for cleaning up temporary files
 import path from "path"; // Import path module for handling file paths
-
+import adminRoutes from "./routes/adminRoutes.js"
 dotenv.config(); // Load environment variables
 
 const app = express();
@@ -53,7 +53,7 @@ app.use("/api/", departementRoutes);
 app.use("/api/", orderRoutes);
 app.use("/api/", categoryRoutes);
 app.use("/api/", notificationRoutes);
-
+app.use("/api",adminRoutes );
 // Image upload route
 app.post("/api/upload", upload.single("image"), async (req, res) => {
     try {

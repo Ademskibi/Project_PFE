@@ -17,11 +17,12 @@ const UserDetails = ({ userId }) => {
       const response = await fetch(`http://localhost:5000/api/user/${userId}`);
       const data = await response.json();
       setUserDetails(data);
-
+      console.log(data)
       // Set the form data with user details
       setFormData({
         name: data.name,
         email: data.email,
+
         role: data.role,
         departmentId: data.departmentId || "", // Default to empty if no department
       });
@@ -66,9 +67,15 @@ const UserDetails = ({ userId }) => {
       console.error("❌ Error updating user:", error);
     }
   };
-
+console.log(formData)
   // Get the department name based on departmentId
-
+  const getDepartmentName = () => {
+    if (!formData.departmentId) {
+      return "Select Department";
+    }
+    const department = departments.find(dept => dept._id === formData.departmentId);
+    return department ? department.name : "Unknown Department";
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-10 mt-10 bg-white rounded-3xl shadow-2xl">
@@ -124,8 +131,8 @@ const UserDetails = ({ userId }) => {
               >
                 {/* Default option when no department is selected */}
                 <option value="" disabled>
-                {formData.departmentId.name || "Select Department"}
-                </option>
+                  {formData.departmentId.name}
+                  </option>
 
                 {/* List departments */}
                 {departments.map((dept) => (
