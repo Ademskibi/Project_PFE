@@ -21,7 +21,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-5 rounded-2xl shadow-md transition hover:shadow-lg flex flex-col">
+    <div className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm transition transform hover:scale-105 hover:shadow-lg flex flex-col w-full max-w-xs">
       {/* Product Image */}
       <img
         src={product.imgUrl || "/default-image.jpg"}
@@ -29,11 +29,11 @@ const ProductCard = ({ product }) => {
         onError={(e) => {
           e.target.src = "/default-image.jpg";
         }}
-        className="w-full h-40 object-cover rounded-xl mb-3 border border-gray-100"
+        className="w-full h-40 object-cover rounded-lg mb-4"
       />
 
       {/* Product Name */}
-      <h3 className="text-xl font-semibold text-gray-800 mb-1">{product.name}</h3>
+      <h3 className="text-xl font-semibold text-gray-800 mb-2">{product.name}</h3>
 
       {/* Available Quantity */}
       <p className="text-gray-500 text-sm mb-4">In Stock: {product.stock}</p>
@@ -59,7 +59,6 @@ const ProductCard = ({ product }) => {
           role="dialog"
         >
           <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full relative">
-            {/* Close Button */}
             <button
               onClick={closeModal}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
@@ -67,8 +66,6 @@ const ProductCard = ({ product }) => {
             >
               ×
             </button>
-
-            {/* AddOrder Component */}
             <AddOrder item={{ productId: product }} onClose={closeModal} />
           </div>
         </div>

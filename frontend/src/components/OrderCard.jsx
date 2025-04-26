@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 
 const OrderCard = ({ order, onOrderAction }) => {
-  const handleUpdateStatus = async (orderId, newStatus) => {
+  const [isDeclining, setIsDeclining] = useState(false);
+  const [declineMessage, setDeclineMessage] = useState("");
+
+  const handleUpdateStatus = async (orderId, newStatus, customMessage = "") => {
     try {
+      // Update order status
       const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -14,12 +18,11 @@ const OrderCard = ({ order, onOrderAction }) => {
         return;
       }
 
+      // Rollback product stock if declined
       if (newStatus === "Declined") {
         const updateResponse = await fetch("http://localhost:5000/api/products/update", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             updates: order.items.map((item) => ({
               _id: item.productId._id,
@@ -30,24 +33,22 @@ const OrderCard = ({ order, onOrderAction }) => {
         });
 
         const result = await updateResponse.json();
-
         if (!updateResponse.ok) {
           console.error("❌ Product quantity rollback failed:", result.message);
         }
       }
 
+      // Send notification
       const notificationMessage =
         newStatus === "Approved"
           ? "Your order has been approved ✅"
-          : "Your order was declined ❌";
+          : customMessage || "Your order was declined ❌";
 
       await fetch("http://localhost:5000/api/create_notification", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: order.employeeId?._id,
+          userId: order.employeeId, // fixed: use _id
           message: notificationMessage,
           type: newStatus.toLowerCase(),
           order: order._id,
@@ -61,43 +62,76 @@ const OrderCard = ({ order, onOrderAction }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-200">
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">
-        👤 Employee: {order.employeeId?.name || "Unknown"}
+    <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        👤 Employee:{" "}
+        <span className="font-normal">
+          {order.employeeId?.name || "Unknown"}
+        </span>
       </h3>
 
       <div className="space-y-4">
         {order.items.map((item) => (
           <div
             key={item.productId?._id}
-            className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl shadow-sm"
+            className="flex items-center gap-4 bg-gray-100 p-4 rounded-xl shadow-sm"
           >
             <img
               src={item.productId?.imgUrl || "https://via.placeholder.com/100"}
               alt={item.productId?.name}
-              className="w-20 h-20 object-cover rounded-xl border border-gray-200"
+              className="w-20 h-20 object-cover rounded-xl border border-gray-300"
             />
             <div>
-              <p className="text-lg font-medium text-gray-900">{item.productId?.name}</p>
+              <p className="text-base font-medium text-gray-900">{item.productId?.name}</p>
               <p className="text-gray-600 text-sm">Quantity: {item.quantity}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 flex justify-end gap-4">
+      {isDeclining && (
+        <div className="mt-5">
+          <label className="block text-sm text-gray-700 mb-2">
+            Reason for decline (optional):
+          </label>
+          <textarea
+            className="w-full rounded-xl border border-gray-300 p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-500"
+            rows="3"
+            value={declineMessage}
+            onChange={(e) => setDeclineMessage(e.target.value)}
+            placeholder="Explain why this order was declined..."
+          />
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button
+          type="button"
           onClick={() => handleUpdateStatus(order._id, "Approved")}
-          className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded-2xl transition duration-200 shadow-md"
+          className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl shadow transition duration-200"
         >
           ✔ Approve
         </button>
-        <button
-          onClick={() => handleUpdateStatus(order._id, "Declined")}
-          className="px-5 py-2 bg-red-600 hover:bg-red-500 text-white rounded-2xl transition duration-200 shadow-md"
-        >
-          ✖ Decline
-        </button>
+
+        {!isDeclining ? (
+          <button
+            type="button"
+            onClick={() => setIsDeclining(true)}
+            className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow transition duration-200"
+          >
+            ✖ Decline
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() =>
+              handleUpdateStatus(order._id, "Declined", declineMessage)
+            }
+            className="px-6 py-2 bg-red-700 hover:bg-red-600 text-white rounded-xl shadow transition duration-200"
+          >
+            🚫 Confirm Decline
+          </button>
+        )}
       </div>
     </div>
   );

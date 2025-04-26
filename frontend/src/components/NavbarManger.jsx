@@ -1,31 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser } from "../redux/slices/userSlice";
 
 const NavbarManger = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
 
-  // Toggle Notifications Dropdown
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
   };
 
-  // Logout Function (Using Axios Instead of Fetch)
   const logout = async () => {
     try {
       await axios.post(
         "http://localhost:5000/api/logout",
         {},
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
-
-      // Clear token and redirect to login page
       localStorage.removeItem("token");
+      dispatch(clearUser());
       navigate("/");
     } catch (error) {
       console.error("Error logging out", error);
@@ -33,7 +36,6 @@ const NavbarManger = () => {
     }
   };
 
-  // Close Notifications When Clicking Outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -48,164 +50,110 @@ const NavbarManger = () => {
   }, []);
 
   useEffect(() => {
+    if (!user?._id) return;
+
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get("/notifications", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        const response = await axios.get(`/notifications`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
-        setNotifications(response.data.notifications);
+        setNotifications(response.data.notifications || []);
       } catch (error) {
         console.error("Error fetching notifications", error);
       }
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
-
+    const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user?._id]);
 
   return (
-    <nav className="flex justify-between items-center p-4 bg-gray-800 text-white relative">
-      {/* Logo or Title */}
-      <h2 className="text-2xl font-semibold">Supplies Inventory</h2>
+    <nav className="flex justify-between items-center px-8 py-4 bg-white border-b shadow-sm text-gray-900 relative">
+      <h2 className="text-2xl font-semibold tracking-wide">Supplies Inventory</h2>
 
-      <div className="flex items-center space-x-6 relative">
-        {/* Home Button */}
+      <div className="flex items-center gap-4 relative">
+        {/* Home */}
         <button
           onClick={() => navigate("/Main_Page")}
-          className="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-500"
+          className="p-2 rounded hover:bg-gray-100 transition"
+          title="Home"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 21V9h6v12"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V9h6v12" />
           </svg>
         </button>
-        <button
-  onClick={() => navigate("/orders")}
-  className="bg-green-600 text-white p-2 rounded-md hover:bg-green-500"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-    className="w-6 h-6"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12h6m-6 4h6m-6-8h6M4 6h16v12H4z"
-    />
-  </svg>
-</button>
 
-        {/* Cart Button */}
+        {/* Orders */}
+        <button
+          onClick={() => navigate("/orders")}
+          className="p-2 rounded hover:bg-gray-100 transition"
+          title="Orders"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-6-8h6M4 6h16v12H4z" />
+          </svg>
+        </button>
+
+        {/* Cart */}
         <button
           onClick={() => navigate("/cart")}
-          className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-500"
+          className="p-2 rounded hover:bg-gray-100 transition"
+          title="Cart"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
         </button>
 
-        {/* Notifications Button */}
+        {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={toggleNotifications}
-            className="bg-yellow-600 text-white p-2 rounded-md hover:bg-yellow-500 flex items-center relative"
-            aria-expanded={showNotifications}
-            aria-haspopup="true"
+            className="p-2 rounded hover:bg-gray-100 transition relative"
+            title="Notifications"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 17h5l-1.405-1.405C18.21 14.21 18 13.702 18 13V9a6 6 0 10-12 0v4c0 .702-.21 1.21-.595 1.595L4 17h5m6 0a3 3 0 11-6 0"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405C18.21 14.21 18 13.702 18 13V9a6 6 0 10-12 0v4c0 .702-.21 1.21-.595 1.595L4 17h5m6 0a3 3 0 11-6 0" />
             </svg>
             {notifications.length > 0 && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
                 {notifications.length}
               </span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
-              <h3 className="text-lg font-semibold text-gray-700">Notifications</h3>
-              <ul className="mt-2 max-h-40 overflow-y-auto">
+            <div className="absolute right-0 mt-3 w-72 bg-white border rounded shadow-lg z-50">
+              <h3 className="text-base font-semibold px-4 py-2 border-b text-gray-700">Notifications</h3>
+              <ul className="max-h-60 overflow-y-auto text-sm">
                 {notifications.length > 0 ? (
                   notifications.map((notification, index) => (
-                    <li
-                      key={index}
-                      className="p-2 text-gray-800 border-b last:border-b-0"
-                    >
+                    <li key={index} className="px-4 py-2 text-gray-800 border-b last:border-none hover:bg-gray-50">
                       {notification.message || "New update available"}
                     </li>
                   ))
                 ) : (
-                  <li className="p-2 text-gray-500">No new notifications</li>
+                  <li className="px-4 py-2 text-gray-500">No new notifications</li>
                 )}
               </ul>
             </div>
           )}
         </div>
 
-        {/* Logout Button */}
+        {/* Logout */}
         <button
-          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-500"
+          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
           onClick={logout}
+          title="Logout"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2v1"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2v1" />
           </svg>
+          Logout
         </button>
       </div>
     </nav>

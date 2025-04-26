@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OrderCard from "./OrderCard.jsx";
-
+import Navbar from "../../components/Navbar.jsx"
 const Mangeorder = () => {
   const [orders, setOrders] = useState([]);
 
@@ -27,7 +27,10 @@ const Mangeorder = () => {
 
 
   return (
-    <div className="p-6">
+    <div>
+       <Navbar />
+      <div className="p-6">
+     
       <h2 className="text-2xl font-bold mb-4">Storekeeper</h2>
       {orders.length === 0 ? (
         <p>No approved orders.</p>
@@ -36,6 +39,7 @@ const Mangeorder = () => {
           <OrderCard key={order._id} order={order} onOrderAction={fetchOrders} />
         ))
       )}
+    </div>
     </div>
   );
 };

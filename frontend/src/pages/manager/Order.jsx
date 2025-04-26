@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import OrderCard from "./OrderCard";
-import Navbar from "./Navbar";
+import OrderCard from "../../components/OrderCard";
+import NavbarManger from "../../components/NavbarManger";
 
 const Order = () => {
   const [orders, setOrders] = useState([]);
@@ -28,7 +28,7 @@ const Order = () => {
 
   return (
     <div>
-        <Navbar />
+        <NavbarManger />
       <h2 className="text-2xl font-bold mb-4">Pending Orders</h2>
 
       {orders.length === 0 ? (

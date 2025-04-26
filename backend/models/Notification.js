@@ -7,7 +7,7 @@ const NotificationSchema = new mongoose.Schema({
     order: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
     type: { 
         type: String, 
-        enum: ["approve", "reject"], 
+        enum: ["approve", "reject","ready to pick up","wainting"], 
         required: true 
     }
 });

@@ -10,7 +10,7 @@ import Navbar from "./components/Navbar";
 import ProductsPage from "./pages/ProductsPage";
 import Mainpage from "./pages/emplyee/Mainpage";
 import AdminMain from "./pages/admin/AdminMain";
-import Orders from "./components/Order";
+import Orders from "./pages/manager/Order";
 import Cart from "./pages/Cart";
 import Orderlist from "./components/Orderlist";
 import Mangeorder from "./pages/storekeeper/Mangeorder";

@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../../components/Navbar.jsx"
 
 const AdminMain = () => {
   const navigate = useNavigate(); // Use inside the component
@@ -13,7 +14,7 @@ const AdminMain = () => {
 
   return (
     <div className="p-6">
-        
+        <Navbar />
       {/* Admin Panel Header */}
       <div className="flex justify-between items-center bg-gray-100 p-4 rounded-md shadow-md">
         <h2 className="text-xl font-semibold">Admin Dashboard</h2>
