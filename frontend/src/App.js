@@ -16,7 +16,7 @@ import Orderlist from "./components/Orderlist";
 import Mangeorder from "./pages/storekeeper/Mangeorder";
 import PrivateRoute from "./components/PrivateRoute";
 import NotAllowed from "./components/NotAllowed";
-
+import Supplies from "./pages/storekeeper/Supplies";
 function App() {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -36,7 +36,7 @@ function App() {
     <Routes>
       {/* Redirect root to login */}
       <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="/home   " element={<Navigate to="/login" />} />
+      <Route path="/home" element={<Navigate to="/login" />} />
 
       {/* Public routes */}
       <Route path="/login" element={<Login />} />
@@ -119,6 +119,14 @@ function App() {
         element={
           <PrivateRoute allowedRoles={["storekeeper"]}>
             <Mangeorder />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/Supplies"
+        element={
+          <PrivateRoute allowedRoles={["storekeeper"]}>
+            <Supplies />
           </PrivateRoute>
         }
       />

@@ -39,20 +39,16 @@ export const getAvailableProducts = async (req, res) => {
 };
 
 // 🔵 Get Single Product by name or itemId
+// Fix for GET by ID from URL
 export const getAProduct = async (req, res) => {
   try {
-    const { name, _id } = req.body;
+    const { productId } = req.params; // get from URL params
 
-    if (!name && !_id) {
-      return res.status(400).json({ message: "❌ Either name or _id is required" });
+    if (!productId) {
+      return res.status(400).json({ message: "❌ Product ID is required" });
     }
 
-    let product;
-    if (_id) {
-      product = await Product.findById(_id).populate("categoryId", "name");
-    } else {
-      product = await Product.findOne({ name }).populate("categoryId", "name");
-    }
+    const product = await Product.findById(productId).populate("categoryId", "name");
 
     if (!product) {
       return res.status(404).json({ message: "❌ Product not found" });
@@ -63,6 +59,7 @@ export const getAProduct = async (req, res) => {
     res.status(500).json({ message: "❌ Error fetching product", error: error.message });
   }
 };
+
 
 
 // 🔴 Create a Product (with Image Upload)

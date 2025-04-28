@@ -1,66 +1,48 @@
 import React, { useState, useEffect } from "react";
+import ProductDetails from "./ProductDetails"; // Make sure the file name is correct!
 
 const Supplies = () => {
   const [products, setProducts] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  // Fetch all products
   const fetchProducts = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/products", {
-        cache: "no-store", // Avoids 304 Not Modified issues
+        cache: "no-store",
       });
       const data = await response.json();
-      console.log(data); // Check what you receive
-      
-      // Here data is an array already
       setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("❌ Error fetching products:", error);
     }
   };
 
-  // Delete a product
   const deleteProduct = async (_id) => {
     try {
       const response = await fetch("http://localhost:5000/api/product/delete", {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ _id }),
       });
       const data = await response.json();
-      if (data.message) fetchProducts();
+      if (data.message) {
+        fetchProducts();
+      }
     } catch (error) {
       console.error("❌ Error deleting product:", error);
-    }
-  };
-
-  // Update a product (example: just change name to "Updated Product Name")
-  const updateProduct = async (_id) => {
-    const updatedData = { name: "Updated Product Name" };
-    try {
-      const response = await fetch("http://localhost:5000/api/product/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ _id, ...updatedData }),
-      });
-      const data = await response.json();
-      if (data.message) fetchProducts();
-    } catch (error) {
-      console.error("❌ Error updating product:", error);
     }
   };
 
   useEffect(() => {
     fetchProducts();
   }, []);
- console.log(products); // Check what you receive
+
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Product Management</h2>
+      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
+        Product Management
+      </h2>
+
       <div className="overflow-x-auto rounded-lg shadow-lg">
         <table className="min-w-full bg-white border border-gray-200">
           <thead className="bg-gray-100">
@@ -87,10 +69,12 @@ const Supplies = () => {
                   <td className="px-6 py-4 border-b">{product.itemId}</td>
                   <td className="px-6 py-4 border-b">{product.name}</td>
                   <td className="px-6 py-4 border-b">{product.stock}</td>
-                  <td className="px-6 py-4 border-b">{product.categoryId?.name || "No category"}</td>
+                  <td className="px-6 py-4 border-b">
+                    {product.categoryId?.name || "No category"}
+                  </td>
                   <td className="px-6 py-4 border-b text-center space-x-2">
                     <button
-                      onClick={() => updateProduct(product._id)}
+                      onClick={() => setSelectedProductId(product._id)}
                       className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
                     >
                       Update
@@ -114,6 +98,17 @@ const Supplies = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Show ProductDetails when a product is selected */}
+      {selectedProductId && (
+        <ProductDetails
+          productId={selectedProductId}
+          onProductUpdated={() => {
+            fetchProducts();
+            setSelectedProductId(null);
+          }}
+        />
+      )}
     </div>
   );
 };
