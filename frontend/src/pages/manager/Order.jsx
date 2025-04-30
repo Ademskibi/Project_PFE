@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import OrderCard from "../../components/OrderCard";
+import OrderCard from "./OrderCard";
 import NavbarManger from "../../components/NavbarManger";
 
 const Order = () => {

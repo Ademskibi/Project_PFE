@@ -107,15 +107,15 @@ export const createProduct = async (req, res) => {
 // 🟠 Delete a Product
 export const deleteProduct = async (req, res) => {
   try {
-    const { itemId, id } = req.body;
+    const { itemId, _id } = req.body;
 
-    if (!itemId && !id) {
-      return res.status(400).json({ message: "❌ Either itemId or id is required" });
+    if (!itemId && !_id) {
+      return res.status(400).json({ message: "❌ Either itemId or _id is required" });
     }
 
     let deletedProduct;
-    if (id) {
-      deletedProduct = await Product.findByIdAndDelete(id);
+    if (_id) {
+      deletedProduct = await Product.findByIdAndDelete(_id);
     } else {
       deletedProduct = await Product.findOneAndDelete({ itemId });
     }
@@ -129,6 +129,7 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "❌ Error deleting product", error: error.message });
   }
 };
+
 
 // 🟡 Get Products by Category
 export const getProductsByCategory = async (req, res) => {

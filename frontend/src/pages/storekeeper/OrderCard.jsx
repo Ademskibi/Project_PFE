@@ -5,21 +5,22 @@ const OrderCard = ({ order, onOrderAction }) => {
 
   useEffect(() => {
     if (!order?.items?.length) return;
-
     const fetchProducts = async () => {
       try {
         const responses = await Promise.all(
-          order.items.map((item) =>
-            item?.productId
-              ? fetch("http://localhost:5000/api/product", {
-                  method: "POST",
+          order.items.map((item) => {
+            const productId = item?.productId?._id;
+            console.log("Fetching product ID:", productId);
+    
+            return productId
+              ? fetch(`http://localhost:5000/api/product/${productId}`, {
+                  method: "GET",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ _id: item.productId }),
                 }).then((res) => res.json())
-              : Promise.resolve(null)
-          )
+              : Promise.resolve(null);
+          })
         );
-
+    
         const productsMap = {};
         order.items.forEach((item, index) => {
           const productId = item?.productId?.toString?.();
@@ -27,12 +28,13 @@ const OrderCard = ({ order, onOrderAction }) => {
             productsMap[productId] = responses[index];
           }
         });
-
+    
         setProducts(productsMap);
       } catch (err) {
         console.error("❌ Failed to fetch products:", err);
       }
     };
+    
 
     fetchProducts();
   }, [order]);

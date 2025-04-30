@@ -59,7 +59,7 @@ const Cart = () => {
         return;
       }
 
-      const updateResponse = await fetch("http://localhost:5000/api/products/update", {
+      const updateResponse = await fetch("http://localhost:5000/api/product/update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OrderCard from "./OrderCard.jsx";
-import Navbar from "../../components/Navbar.jsx"
+import StorekeeperNavbar from "./StorekeeperNavbar.jsx"
 const Mangeorder = () => {
   const [orders, setOrders] = useState([]);
 
@@ -28,7 +28,7 @@ const Mangeorder = () => {
 
   return (
     <div>
-       <Navbar />
+       <StorekeeperNavbar />
       <div className="p-6">
      
       <h2 className="text-2xl font-bold mb-4">Storekeeper</h2>
