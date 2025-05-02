@@ -54,7 +54,6 @@ app.use("/api/", orderRoutes);
 app.use("/api/", categoryRoutes);
 app.use("/api/", notificationRoutes);
 app.use("/api",adminRoutes );
-// Image upload route
 app.post("/api/upload", upload.single("image"), async (req, res) => {
     try {
         if (!req.file) {

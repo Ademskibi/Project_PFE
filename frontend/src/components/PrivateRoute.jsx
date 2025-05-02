@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 const PrivateRoute = ({ children, allowedRoles }) => {
   const user = useSelector((state) => state.user.user);
 
-  console.log("User object:", user); // Debugging line
 
   if (!user) {
     return <Navigate to="/login" replace />;

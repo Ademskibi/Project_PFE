@@ -15,6 +15,7 @@ const Supplies = () => {
       const response = await fetch("http://localhost:5000/api/products", {
         cache: "no-store",
       });
+      if (!response.ok) throw new Error("Bad response");
       const data = await response.json();
       setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -26,7 +27,7 @@ const Supplies = () => {
   };
 
   const deleteProduct = async (_id) => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    if (!_id || !window.confirm("Are you sure you want to delete this product?")) return;
     setLoading(true);
     try {
       const response = await fetch("http://localhost:5000/api/product/delete", {
@@ -34,6 +35,7 @@ const Supplies = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ _id }),
       });
+      if (!response.ok) throw new Error("Delete failed");
       const data = await response.json();
       if (data.message) {
         alert("✅ Product deleted successfully.");
@@ -50,25 +52,24 @@ const Supplies = () => {
   };
 
   const processWaitingList = async (_id) => {
+    if (!_id) return;
     setLoading(true);
     try {
       const productRes = await fetch(`http://localhost:5000/api/product/${_id}`);
+      if (!productRes.ok) throw new Error("Product fetch failed");
       const productData = await productRes.json();
-      console.log("Product data:", productData);  
-      const updatedStock = productData
-      .stock;
+      const updatedStock = productData?.stock;
 
       const ordersRes = await fetch("http://localhost:5000/api/orders/status/Waiting list");
+      if (!ordersRes.ok) throw new Error("Orders fetch failed");
       const orders = await ordersRes.json();
 
       const relevantOrders = orders.filter((order) =>
         order.items.some((item) => item.productId?._id === _id)
       );
-      console.log("Relevant orders:", relevantOrders);
+
       for (const order of relevantOrders) {
         const item = order.items.find((i) => i.productId?._id === _id);
-        console.log("Item in order:", item);
-        console.log("Updated stock:", updatedStock);
         if (item && updatedStock >= item.quantity) {
           await fetch(`http://localhost:5000/api/orders/${order._id}/status`, {
             method: "PUT",
@@ -84,6 +85,17 @@ const Supplies = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               updates: [{ _id, operator: "decrease", stock: item.quantity }],
+            }),
+          });
+
+          await fetch("http://localhost:5000/api/create_notification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: order.employeeId,
+              message: "come tom store and get your order",
+              type: "ready to pick up",
+              order: order._id,
             }),
           });
         }
@@ -138,7 +150,7 @@ const Supplies = () => {
                   <tr key={product._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 border-b">
                       <img
-                        src={product.imgUrl}
+                        src={product.imgUrl || "https://via.placeholder.com/64"}
                         alt={product.name}
                         className="h-16 w-16 object-cover rounded"
                       />
