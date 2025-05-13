@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearUser } from "../redux/slices/userSlice";
+import { clearUser } from "../../redux/slices/userSlice";
 const Navbar = () => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -85,6 +85,7 @@ const Navbar = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V9h6v12" />
           </svg>
+          home 
         </button>
 
         <button
@@ -102,6 +103,7 @@ const Navbar = () => {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-6-8h6M4 6h16v12H4z" />
           </svg>
+          Orders
         </button>
 
         <button
@@ -119,6 +121,7 @@ const Navbar = () => {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
+          Cart
         </button>
 
         {/* Notifications */}

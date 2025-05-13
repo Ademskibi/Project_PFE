@@ -6,7 +6,7 @@ import Users from "./pages/admin/Users";
 import Login from "./pages/Login/Login";
 import AddUser from "./pages/admin/AddUser";
 import AddProduct from "./pages/admin/AddProduct";
-import Navbar from "./components/Navbar";
+import Navbar from "./pages/emplyee/Navbar";
 import ProductsPage from "./pages/ProductsPage";
 import Mainpage from "./pages/emplyee/Mainpage";
 import AdminMain from "./pages/admin/AdminMain";
