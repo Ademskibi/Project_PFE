@@ -94,3 +94,40 @@ function findCount(array, month) {
   const item = array.find(i => i._id === month);
   return item ? item.count : 0;
 }
+export const getUserStats = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const orders = await Order.find({ employeeId: id });
+
+    // Optionally, count orders by month
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+
+    const ordersByMonth = await Order.aggregate([
+      {
+        $match: {
+          employeeId: id,
+          createdAt: { $gte: sixMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const months = generateLastSixMonths();
+    const chartData = months.map(month => ({
+      name: month,
+      orders: findCount(ordersByMonth, month)
+    }));
+
+    res.status(200).json({ orders, chartData });
+  } catch (err) {
+    console.error("Error fetching user stats:", err);
+    res.status(500).json({ message: "Failed to fetch user stats" });
+  }
+};
+

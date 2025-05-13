@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MangerNavbar from "./MangerNavbar";
+import AdminNavbar from "./AdminNavbar";
 import axios from "axios";
 
 const AdminMain = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
+
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [userOrders, setUserOrders] = useState([]);
+
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const statsRes = await axios.get("http://localhost:5000/api/stats");
-        const usersRes = await axios.get("http://localhost:5000/api/users");
+        const productsRes = await axios.get("http://localhost:5000/api/products");
 
-        if (statsRes.data && usersRes.data) {
-          setStats(statsRes.data.stats);
+        if (statsRes.data && productsRes.data) {
+          setStats(statsRes.data.stats); // Keep backend-provided totalProducts
           setChartData(statsRes.data.chartData || []);
-          setAllUsers(usersRes.data);
+          setAllProducts(productsRes.data);
         } else {
           setError("No data received from server.");
         }
@@ -66,7 +69,11 @@ const AdminMain = () => {
 
   return (
     <div className="p-6">
+<<<<<<< HEAD
       <MangerNavbar />
+=======
+      <AdminNavbar />
+>>>>>>> e34ca74 (My local changes before pull)
 
       {/* Stats Section */}
       {error ? (
@@ -129,6 +136,7 @@ const AdminMain = () => {
         <div className="text-gray-500 text-center mt-6">No activity data available.</div>
       )}
 
+<<<<<<< HEAD
       {/* User Orders Section */}
       <div className="bg-white p-6 rounded-md shadow-md mb-8">
         <h3 className="text-lg font-semibold mb-4">View Orders by User</h3>
@@ -176,6 +184,10 @@ const AdminMain = () => {
           </>
         )}
       </div>
+=======
+     
+
+>>>>>>> e34ca74 (My local changes before pull)
     </div>
   );
 };

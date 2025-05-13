@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
+=======
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+>>>>>>> e34ca74 (My local changes before pull)
 
 const OrderCard = ({ order, onOrderAction }) => {
+  const navigate = useNavigate();
   const [isDeclining, setIsDeclining] = useState(false);
   const [declineMessage, setDeclineMessage] = useState("");
   const [productDetailsMap, setProductDetailsMap] = useState({});
@@ -32,7 +38,10 @@ const OrderCard = ({ order, onOrderAction }) => {
 
   const handleUpdateStatus = async (orderId, newStatus, customMessage = "") => {
     try {
+<<<<<<< HEAD
       // 1. Update order status
+=======
+>>>>>>> e34ca74 (My local changes before pull)
       const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -41,7 +50,10 @@ const OrderCard = ({ order, onOrderAction }) => {
 
       if (!response.ok) throw new Error("Failed to update order status");
 
+<<<<<<< HEAD
       // 2. If Declined, restore product stock
+=======
+>>>>>>> e34ca74 (My local changes before pull)
       if (newStatus === "Declined") {
         const updateResponse = await fetch("http://localhost:5000/api/products/update", {
           method: "PUT",
@@ -61,7 +73,10 @@ const OrderCard = ({ order, onOrderAction }) => {
         }
       }
 
+<<<<<<< HEAD
       // 3. Send notification
+=======
+>>>>>>> e34ca74 (My local changes before pull)
       const notificationMessage =
         newStatus === "Approved"
           ? "Your order has been approved ✅"
@@ -93,6 +108,7 @@ const OrderCard = ({ order, onOrderAction }) => {
         </span>
       </h3>
 
+<<<<<<< HEAD
       <div className="space-y-3">
         {order.items.map((item) => {
           const id = item.productId?._id || item.productId;
@@ -117,6 +133,29 @@ const OrderCard = ({ order, onOrderAction }) => {
                   <p className="text-gray-400 text-sm">Stock: {product.stock}</p>
                 )}
               </div>
+=======
+      <button
+        onClick={() => navigate(`/user_stats/${order.employeeId._id}`)}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+      >
+        Show Previous Orders
+      </button>
+
+      <div className="space-y-4">
+        {order?.items?.map((item) => (
+          <div
+            key={item.productId?._id}
+            className="flex items-center gap-4 bg-gray-100 p-4 rounded-xl shadow-sm"
+          >
+            <img
+              src={item.productId?.imgUrl || "https://via.placeholder.com/100"}
+              alt={item.productId?.name}
+              className="w-20 h-20 object-cover rounded-xl border border-gray-300"
+            />
+            <div>
+              <p className="text-base font-medium text-gray-900">{item.productId?.name}</p>
+              <p className="text-gray-600 text-sm">Quantity: {item.quantity}</p>
+>>>>>>> e34ca74 (My local changes before pull)
             </div>
           );
         })}
@@ -157,9 +196,7 @@ const OrderCard = ({ order, onOrderAction }) => {
         ) : (
           <button
             type="button"
-            onClick={() =>
-              handleUpdateStatus(order._id, "Declined", declineMessage)
-            }
+            onClick={() => handleUpdateStatus(order._id, "Declined", declineMessage)}
             className="px-6 py-2 bg-red-700 hover:bg-red-600 text-white rounded-xl shadow transition duration-200"
           >
             🚫 Confirm Decline
