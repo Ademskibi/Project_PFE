@@ -1,32 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MangerNavbar from "./MangerNavbar";
+import AdminNavbar from "./AdminNavbar";
 import axios from "axios";
 
 const AdminMain = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-    
-        const res = await axios.get("http://localhost:5000/api/stats", {
-        
-        });
+        const statsRes = await axios.get("http://localhost:5000/api/stats");
+        const productsRes = await axios.get("http://localhost:5000/api/products");
 
-        if (res.data) {
-          setStats(res.data.stats);
-          setChartData(res.data.chartData || []);
+        if (statsRes.data && productsRes.data) {
+          setStats(statsRes.data.stats); // Keep backend-provided totalProducts
+          setChartData(statsRes.data.chartData || []);
+          setAllProducts(productsRes.data);
         } else {
           setError("No data received from server.");
         }
       } catch (err) {
-        console.error("Failed to fetch stats", err);
-        setError("Error loading stats. Please try again.");
+        console.error("Failed to fetch data", err);
+        setError("Error loading data. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -52,18 +52,13 @@ const AdminMain = () => {
 
   return (
     <div className="p-6">
-      <MangerNavbar />
-
-      {/* Admin Header */}
- 
-
-
+      <AdminNavbar />
 
       {/* Stats Section */}
       {error ? (
         <div className="text-red-500 text-center">{error}</div>
       ) : stats ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white p-4 rounded-md shadow-md text-center">
             <h3 className="text-lg font-semibold mb-2">Total Users</h3>
             <p className="text-2xl">{stats.totalUsers}</p>
@@ -73,8 +68,16 @@ const AdminMain = () => {
             <p className="text-2xl">{stats.activeProducts}</p>
           </div>
           <div className="bg-white p-4 rounded-md shadow-md text-center">
+            <h3 className="text-lg font-semibold mb-2">Total Products</h3>
+            <p className="text-2xl">{stats.totalProducts}</p>
+          </div>
+          <div className="bg-white p-4 rounded-md shadow-md text-center">
             <h3 className="text-lg font-semibold mb-2">Pending Orders</h3>
             <p className="text-2xl">{stats.pendingOrders}</p>
+          </div>
+          <div className="bg-white p-4 rounded-md shadow-md text-center">
+            <h3 className="text-lg font-semibold mb-2">Total Orders</h3>
+            <p className="text-2xl">{stats.totalOrders}</p>
           </div>
         </div>
       ) : (
@@ -83,7 +86,7 @@ const AdminMain = () => {
 
       {/* Chart Section */}
       {chartData.length > 0 ? (
-        <div className="bg-white p-6 rounded-md shadow-md">
+        <div className="bg-white p-6 rounded-md shadow-md mb-8">
           <h3 className="text-lg font-semibold mb-4">Activity Over Last 6 Months</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-center">
@@ -111,6 +114,9 @@ const AdminMain = () => {
       ) : (
         <div className="text-gray-500 text-center mt-6">No activity data available.</div>
       )}
+
+     
+
     </div>
   );
 };

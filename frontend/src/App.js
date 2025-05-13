@@ -17,6 +17,7 @@ import Mangeorder from "./pages/storekeeper/Mangeorder";
 import PrivateRoute from "./components/PrivateRoute";
 import NotAllowed from "./components/NotAllowed";
 import Supplies from "./pages/storekeeper/Supplies";
+import UserStats from "./pages/manager/UserStats";
 function App() {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -71,6 +72,14 @@ function App() {
         element={
           <PrivateRoute allowedRoles={["administrator", "employee", "storekeeper"]}>
             <ProductsPage />
+          </PrivateRoute>
+        }
+      />
+       <Route
+        path="/user_stats/:userId"
+        element={
+          <PrivateRoute allowedRoles={["administrator", "manager"]}>
+            <UserStats />
           </PrivateRoute>
         }
       />

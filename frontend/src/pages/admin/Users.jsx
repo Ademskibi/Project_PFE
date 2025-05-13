@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import UserDetails from "./UserDetails"; // Import UserDetails component
-import AdminNavbar from "./MangerNavbar";
+import AdminNavbar from "../manager/MangerNavbar";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);

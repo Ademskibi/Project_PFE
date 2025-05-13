@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const OrderCard = ({ order, onOrderAction }) => {
+  const navigate = useNavigate();
   const [isDeclining, setIsDeclining] = useState(false);
   const [declineMessage, setDeclineMessage] = useState("");
 
   const handleUpdateStatus = async (orderId, newStatus, customMessage = "") => {
     try {
-      // Update order status
       const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -18,7 +19,6 @@ const OrderCard = ({ order, onOrderAction }) => {
         return;
       }
 
-      // Rollback product stock if declined
       if (newStatus === "Declined") {
         const updateResponse = await fetch("http://localhost:5000/api/products/update", {
           method: "PUT",
@@ -38,7 +38,6 @@ const OrderCard = ({ order, onOrderAction }) => {
         }
       }
 
-      // Send notification
       const notificationMessage =
         newStatus === "Approved"
           ? "Your order has been approved ✅"
@@ -48,7 +47,7 @@ const OrderCard = ({ order, onOrderAction }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: order.employeeId, // fixed: use _id
+          userId: order.employeeId,
           message: notificationMessage,
           type: newStatus.toLowerCase(),
           order: order._id,
@@ -70,8 +69,15 @@ const OrderCard = ({ order, onOrderAction }) => {
         </span>
       </h3>
 
+      <button
+        onClick={() => navigate(`/user_stats/${order.employeeId._id}`)}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+      >
+        Show Previous Orders
+      </button>
+
       <div className="space-y-4">
-        {order.items.map((item) => (
+        {order?.items?.map((item) => (
           <div
             key={item.productId?._id}
             className="flex items-center gap-4 bg-gray-100 p-4 rounded-xl shadow-sm"
@@ -124,9 +130,7 @@ const OrderCard = ({ order, onOrderAction }) => {
         ) : (
           <button
             type="button"
-            onClick={() =>
-              handleUpdateStatus(order._id, "Declined", declineMessage)
-            }
+            onClick={() => handleUpdateStatus(order._id, "Declined", declineMessage)}
             className="px-6 py-2 bg-red-700 hover:bg-red-600 text-white rounded-xl shadow transition duration-200"
           >
             🚫 Confirm Decline
