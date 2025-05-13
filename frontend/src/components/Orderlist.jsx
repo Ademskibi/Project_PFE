@@ -25,8 +25,11 @@ const Orderlist = () => {
           return;
         }
 
-        setOrders(data);
-        console.log("🚀 Order data:", data);
+        // Sort orders by createdAt in descending order (newest first)
+        const sortedOrders = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        setOrders(sortedOrders);
+        console.log("🚀 Order data:", sortedOrders);
       } catch (error) {
         console.error("❌ Fetch error:", error);
       }
