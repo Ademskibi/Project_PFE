@@ -71,8 +71,10 @@ const AddUser = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white p-4 relative">
-            <AdminNavbar />
+        <div>
+            <AdminNavbar/>
+            <div className="min-h-screen flex items-center justify-center bg-white p-4 relative">
+            
             <ToastContainer position="top-right" autoClose={3000} />
             <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl z-10">
                 <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Add New User</h2>
@@ -171,6 +173,7 @@ const AddUser = () => {
                     </button>
                 </form>
             </div>
+        </div>
         </div>
     );
 };

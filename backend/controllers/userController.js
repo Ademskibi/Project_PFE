@@ -134,7 +134,7 @@ export const getUserById = async (req, res) => {
       return res.status(400).json({ message: "❌ userId is required" });
     }
 
-    const user = await User.findById(userId).populate("departmentId", "name");
+    const user = await User.findOne({ userId }).populate("departmentId", "name");
 
     if (!user) {
       return res.status(404).json({ message: "❌ User not found" });
@@ -145,8 +145,7 @@ export const getUserById = async (req, res) => {
     res.status(500).json({ message: "❌ Error fetching user", error: error.message });
   }
 };
-<<<<<<< HEAD
-=======
+
 
 // ✅ Get users by department
 export const getUsersByDepartment = async (req, res) => {
@@ -169,4 +168,3 @@ export const getUsersByDepartment = async (req, res) => {
   }
 };
 
->>>>>>> a716f8ede7e3297837565910e8ee6c069239b6c3

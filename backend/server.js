@@ -53,12 +53,6 @@ app.use("/api/", departementRoutes);
 app.use("/api/", orderRoutes);
 app.use("/api/", categoryRoutes);
 app.use("/api/", notificationRoutes);
-<<<<<<< HEAD
-=======
-
-app.use("/api",adminRoutes );
-
->>>>>>> a716f8ede7e3297837565910e8ee6c069239b6c3
 app.use("/api/stats",adminRoutes );
 // Image upload route
 

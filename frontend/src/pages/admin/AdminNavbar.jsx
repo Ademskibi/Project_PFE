@@ -28,73 +28,69 @@ const AdminNavbar = () => {
   };
 
   return (
-    <div className="flex justify-end items-center gap-4 p-4 bg-white shadow">
-      {/* Add User Button */}
-      <button
-        onClick={() => navigate("/Add_User")}
-        className="p-2 rounded hover:bg-gray-100 transition"
-        title="Add User"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-6 h-6 text-indigo-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2 4a6 6 0 11-4.24-10.24A6 6 0 0112 20z"
-          />
-        </svg>
-      </button>
+    <div className="flex justify-between items-center px-6 py-4 bg-white shadow-md border-b">
+      <div className="text-lg font-semibold text-gray-700">Admin Dashboard</div>
 
-      {/* Add Product Button */}
-      <button
-        onClick={() => navigate("/Add_Product")}
-        className="p-2 rounded hover:bg-gray-100 transition"
-        title="Add Product"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-6 h-6 text-green-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
+      <div className="flex items-center gap-4">
+        {/* Home */}
+        <button
+          onClick={() => navigate("/login")}
+          className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-blue-600 transition"
+          title="Home"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4v4m0 0h4m-4 0H8m8 2a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V10a2 2 0 012-2h8z"
-          />
-        </svg>
-      </button>
+          🏠 Home
+        </button>
 
-      {/* Logout Button */}
-      <button
-        className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-        onClick={logout}
-        title="Logout"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
+        {/* View Users */}
+        <button
+          onClick={() => navigate("/Users")}
+          className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium transition"
+          title="View Users"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2v1"
-          />
-        </svg>
-        Logout
-      </button>
+          👥 Users
+        </button>
+
+        {/* Add User */}
+        <button
+          onClick={() => navigate("/Add_User")}
+          className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-indigo-600 transition"
+          title="Add User"
+        >
+          ➕ Add User
+        </button>
+
+        {/* Add Product */}
+        <button
+          onClick={() => navigate("/Add_Product")}
+          className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-green-600 transition"
+          title="Add Product"
+        >
+          📦 Add Product
+        </button>
+
+        {/* Logout */}
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition text-sm"
+          title="Logout"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h6a2 2 0 012 2v1"
+            />
+          </svg>
+          Logout
+        </button>
+      </div>
     </div>
   );
 };
