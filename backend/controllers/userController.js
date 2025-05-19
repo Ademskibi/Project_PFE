@@ -145,3 +145,28 @@ export const getUserById = async (req, res) => {
     res.status(500).json({ message: "❌ Error fetching user", error: error.message });
   }
 };
+<<<<<<< HEAD
+=======
+
+// ✅ Get users by department
+export const getUsersByDepartment = async (req, res) => {
+  try {
+    const { departmentId } = req.params;
+
+    if (!departmentId) {
+      return res.status(400).json({ message: "❌ departmentId is required" });
+    }
+
+    const users = await User.find({ departmentId }).populate("departmentId", "name");
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "❌ No users found for this department" });
+    }
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "❌ Error fetching users by department", error: error.message });
+  }
+};
+
+>>>>>>> a716f8ede7e3297837565910e8ee6c069239b6c3

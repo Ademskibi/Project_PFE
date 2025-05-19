@@ -7,12 +7,16 @@ const AdminMain = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
+
+  const [allUsers, setAllUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [userOrders, setUserOrders] = useState([]);
+
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchInitialData = async () => {
       try {
         const statsRes = await axios.get("http://localhost:5000/api/stats");
         const productsRes = await axios.get("http://localhost:5000/api/products");
@@ -32,14 +36,27 @@ const AdminMain = () => {
       }
     };
 
-    fetchStats();
+    fetchInitialData();
   }, []);
 
-  const handleNavigation = (event) => {
-    const selectedValue = event.target.value;
-    if (selectedValue) {
-      navigate(selectedValue);
-    }
+  useEffect(() => {
+    const fetchUserOrders = async () => {
+      if (!selectedUserId) return;
+
+      try {
+        const res = await axios.get(`http://localhost:5000/api/orders/employee/${selectedUserId}`);
+        setUserOrders(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user orders", err);
+        setUserOrders([]);
+      }
+    };
+
+    fetchUserOrders();
+  }, [selectedUserId]);
+
+  const handleUserSelect = (e) => {
+    setSelectedUserId(e.target.value);
   };
 
   if (loading) {
@@ -52,7 +69,9 @@ const AdminMain = () => {
 
   return (
     <div className="p-6">
+
       <AdminNavbar />
+
 
       {/* Stats Section */}
       {error ? (
@@ -115,7 +134,57 @@ const AdminMain = () => {
         <div className="text-gray-500 text-center mt-6">No activity data available.</div>
       )}
 
+
+      {/* User Orders Section */}
+      <div className="bg-white p-6 rounded-md shadow-md mb-8">
+        <h3 className="text-lg font-semibold mb-4">View Orders by User</h3>
+        <select
+          className="border p-2 rounded-md mb-4 w-full md:w-1/3"
+          onChange={handleUserSelect}
+          value={selectedUserId}
+        >
+          <option value="">Select a user</option>
+          {allUsers.map((user) => (
+            <option key={user._id} value={user._id}>
+              {user.nom} ({user.email})
+            </option>
+          ))}
+        </select>
+
+        {selectedUserId && (
+          <>
+            {userOrders.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-center">
+                  <thead>
+                    <tr>
+                      <th className="border p-2">Order ID</th>
+                      <th className="border p-2">Status</th>
+                      <th className="border p-2">Ordered at</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userOrders.map((order) => (
+                      <tr key={order._id}>
+                        <td className="border p-2">{order._id}</td>
+                        <td className="border p-2">{order.status}</td>
+                        <td className="border p-2">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-gray-500 text-center">No orders for this user.</div>
+            )}
+          </>
+        )}
+      </div>
+
      
+
 
     </div>
   );

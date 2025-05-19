@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Navbar from "./Navbar";
+import { useSelector } from "react-redux";
+import Navbar from "../pages/emplyee/Navbar";
+
 const Orderlist = () => {
   const user = useSelector((state) => state.user.user);
   const [orders, setOrders] = useState([]);
@@ -24,8 +25,11 @@ const Orderlist = () => {
           return;
         }
 
-        setOrders(data);
-        console.log("🚀 Order data:", data);
+        // Sort orders by createdAt in descending order (newest first)
+        const sortedOrders = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        setOrders(sortedOrders);
+        console.log("🚀 Order data:", sortedOrders);
       } catch (error) {
         console.error("❌ Fetch error:", error);
       }
@@ -36,37 +40,85 @@ const Orderlist = () => {
     }
   }, [user]);
 
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    console.log(`🔧 Update status ${orderId} => ${newStatus}`);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Ready to pick up":
+        return "text-blue-600 font-semibold";
+      case "Not approved yet":
+        return "text-gray-500 font-semibold";
+      case "Declined":
+        return "text-red-600 font-semibold";
+      case "Approved":
+        return "text-green-600 font-semibold";
+      case "Waiting list":
+        return "text-yellow-600 font-semibold";
+      default:
+        return "";
+    }
+  };
+
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
   return (
-
     <div>
-        <Navbar />
-<div className="p-4">
-      <h1 className="text-xl font-bold mb-4">📦 Your Orders</h1>
-      {orders.length === 0 ? (
-        <p>No orders found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {orders.map((order) => (
-            <div key={order._id} className="border rounded p-4 shadow hover:shadow-md transition">
-              <p>Status: <span className="font-medium">{order.status}</span></p>
-              <p>Total Amount: ${order.totalAmount}</p>
-              <div className="mt-2">
-                <h4 className="font-semibold">Items:</h4>
-                {order.items.map((item, index) => (
-                  <div key={index} className="ml-4 text-sm">
-                    {item.productId?.name} x {item.quantity}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+      <Navbar />
+      <div className="p-4">
+        <h1 className="text-xl font-bold mb-4">📦 Your Orders History</h1>
+        {orders.length === 0 ? (
+          <p>No orders found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-400">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border border-gray-400 px-4 py-2 text-center">Product Name</th>
+                  <th className="border border-gray-400 px-4 py-2 text-center">Quantity</th>
+                  <th className="border border-gray-400 px-4 py-2 text-center">Status</th>
+                  <th className="border border-gray-400 px-4 py-2 text-center">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) =>
+                  order.items.map((item, idx) => (
+                    <tr
+                      key={`${order._id}-${idx}`}
+                      className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                    >
+                      <td className="border border-gray-400 px-4 py-2 text-center">
+                        {item.productId?.name || "N/A"}
+                      </td>
+                      <td className="border border-gray-400 px-4 py-2 text-center">
+                        {item.quantity}
+                      </td>
+                      {idx === 0 && (
+                        <>
+                          <td
+                            rowSpan={order.items.length}
+                            className={`border border-gray-400 px-4 py-2 text-center align-middle ${getStatusColor(
+                              order.status
+                            )}`}
+                          >
+                            {order.status}
+                          </td>
+                          <td
+                            rowSpan={order.items.length}
+                            className="border border-gray-400 px-4 py-2 text-center align-middle text-sm text-gray-600"
+                          >
+                            {formatDate(order.createdAt)}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

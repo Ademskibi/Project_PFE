@@ -50,6 +50,7 @@ const Users = () => {
         <th className="px-6 py-3 border-b">Name</th>
         <th className="px-6 py-3 border-b">Email</th>
         <th className="px-6 py-3 border-b">Role</th>
+        <th className="px-6 py-3 border-b">Department</th>
         <th className="px-6 py-3 border-b text-center">Actions</th>
       </tr>
     </thead>
@@ -68,6 +69,7 @@ const Users = () => {
             </td>
             <td className="px-6 py-4 border-b">{user.email}</td>
             <td className="px-6 py-4 border-b capitalize">{user.role}</td>
+            <td className="px-6 py-4 border-b">{user.departmentId?.name || "N/A"}</td>
             <td className="px-6 py-4 border-b text-center space-x-2">
               <button
                 onClick={() => setSelectedUserId(user.userId)}

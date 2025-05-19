@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "./emplyee/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart, removeFromCart } from "../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
