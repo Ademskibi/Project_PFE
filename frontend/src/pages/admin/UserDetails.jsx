@@ -69,7 +69,8 @@ const UserDetails = ({ userId, onUserUpdated }) => {
       setLoading(false);
     }
   };
-
+console.log("User Details:", userDetails);
+  console.log("Form Data:", formData);
   const getDepartmentName = () => {
     const department = departments.find((dept) => dept._id === formData.departmentId);
     return department ? department.name : "Select Department";
@@ -123,7 +124,7 @@ const UserDetails = ({ userId, onUserUpdated }) => {
           <label className="block text-gray-700 mb-2 font-medium">Department:</label>
           <select
             name="departmentId"
-            value={formData.departmentId}
+            value={formData.departmentId._id}
             onChange={handleChange}
             className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
           >

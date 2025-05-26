@@ -6,8 +6,8 @@ import { clearUser } from "../../redux/slices/userSlice";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
 
   const logout = async () => {
     try {
@@ -15,7 +15,9 @@ const AdminNavbar = () => {
         "http://localhost:5000/api/logout",
         {},
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
       localStorage.removeItem("token");
@@ -32,25 +34,22 @@ const AdminNavbar = () => {
       <div className="text-lg font-semibold text-gray-700">Admin Dashboard</div>
 
       <div className="flex items-center gap-4">
-        {/* Home */}
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/home")}
           className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-blue-600 transition"
           title="Home"
         >
           🏠 Home
         </button>
 
-        {/* View Users */}
         <button
           onClick={() => navigate("/Users")}
           className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium transition"
-          title="View Users"
+          title="Users"
         >
           👥 Users
         </button>
 
-        {/* Add User */}
         <button
           onClick={() => navigate("/Add_User")}
           className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-indigo-600 transition"
@@ -59,7 +58,6 @@ const AdminNavbar = () => {
           ➕ Add User
         </button>
 
-        {/* Add Product */}
         <button
           onClick={() => navigate("/Add_Product")}
           className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium text-green-600 transition"
@@ -68,7 +66,6 @@ const AdminNavbar = () => {
           📦 Add Product
         </button>
 
-        {/* Logout */}
         <button
           onClick={logout}
           className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition text-sm"

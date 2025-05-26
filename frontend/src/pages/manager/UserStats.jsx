@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import MangerNavbar from "./MangerNavbar";
+import NavbarManger from "./NavbarManger";
 
 const UserStats = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const UserStats = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <MangerNavbar />
+      <NavbarManger />
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AdminNavbar from "./AdminNavbar";
 
-// Image upload function
+// Upload image to backend or cloud storage
 const imageUpload = async (file) => {
     if (!file) return null;
     const formData = new FormData();
@@ -15,7 +15,7 @@ const imageUpload = async (file) => {
         });
         return response.data.secure_url;
     } catch (error) {
-        console.error("Error uploading image:", error);
+        console.error("❌ Error uploading image:", error);
         return null;
     }
 };
@@ -31,6 +31,7 @@ const AddProduct = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
+    // Fetch categories
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -40,7 +41,7 @@ const AddProduct = () => {
                     setCategories(data.categories);
                 }
             } catch (error) {
-                console.error("Error fetching categories:", error);
+                console.error("❌ Error fetching categories:", error);
             }
         };
         fetchCategories();
@@ -49,7 +50,6 @@ const AddProduct = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isSubmitting) return;
-
         if (!categoryId) return alert("❌ Please select a category.");
 
         setIsSubmitting(true);
@@ -88,8 +88,9 @@ const AddProduct = () => {
             if (!response.ok) throw new Error("Failed to add product");
 
             alert("✅ Product added successfully!");
-            // navigate("/products");
+            navigate("/admin/products"); // optional
         } catch (error) {
+            console.error(error);
             alert("❌ Failed to add product");
         } finally {
             setIsSubmitting(false);
@@ -97,37 +98,37 @@ const AddProduct = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
             <AdminNavbar />
-            <div className="flex justify-center items-center py-10 px-4">
-                <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
-                    <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
-                        🛒 Add New Product
+            <div className="flex justify-center py-10 px-4">
+                <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl shadow-2xl p-8">
+                    <h2 className="text-3xl font-bold text-center text-blue-700 mb-8">
+                        📦 Add New Product
                     </h2>
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <input
                             type="text"
-                            placeholder="Item ID"
+                            placeholder="🆔 Item ID"
                             value={itemId}
                             onChange={(e) => setItemId(e.target.value)}
                             required
-                            className="input-field"
+                            className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-300 outline-none shadow-sm"
                         />
                         <input
                             type="text"
-                            placeholder="Product Name"
+                            placeholder="📦 Product Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
-                            className="input-field"
+                            className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-300 outline-none shadow-sm"
                         />
                         <select
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
                             required
-                            className="input-field"
+                            className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-300 outline-none shadow-sm"
                         >
-                            <option value="">Select Category</option>
+                            <option value="">📁 Select Category</option>
                             {categories.map((category) => (
                                 <option key={category._id} value={category._id}>
                                     {category.name}
@@ -136,31 +137,36 @@ const AddProduct = () => {
                         </select>
                         <input
                             type="number"
-                            placeholder="Stock"
+                            placeholder="📦 Stock"
                             value={stock}
                             onChange={(e) => setStock(e.target.value)}
                             required
                             min="0"
-                            className="input-field"
+                            className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-300 outline-none shadow-sm"
                         />
                         <input
                             type="file"
                             accept="image/*"
                             onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                            className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
-                            file:rounded-lg file:border-0 file:text-sm file:font-semibold
-                            file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            className="w-full file:py-2 file:px-4 file:border-0 file:rounded-md file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                         />
+                        {imageFile && (
+                            <img
+                                src={URL.createObjectURL(imageFile)}
+                                alt="Preview"
+                                className="mt-3 rounded-xl border max-h-48 object-cover mx-auto"
+                            />
+                        )}
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={`w-full py-2 rounded-lg text-white font-semibold transition ${
+                            className={`w-full py-3 rounded-xl text-white font-bold transition shadow-lg ${
                                 isSubmitting
                                     ? "bg-blue-300 cursor-not-allowed"
                                     : "bg-blue-600 hover:bg-blue-700"
                             }`}
                         >
-                            {isSubmitting ? "Adding Product..." : "Add Product"}
+                            {isSubmitting ? "⏳ Adding Product..." : "✅ Add Product"}
                         </button>
                     </form>
                 </div>

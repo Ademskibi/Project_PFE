@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearUser } from "../redux/slices/userSlice";
+import { clearUser } from "../../redux/slices/userSlice";
 
 const NavbarManger = () => {
   const navigate = useNavigate();
@@ -77,7 +77,7 @@ const NavbarManger = () => {
       <div className="flex items-center gap-4 relative">
         {/* Home */}
         <button
-          onClick={() => navigate("/Main_Page")}
+          onClick={() => navigate("/login")}
           className="p-2 rounded hover:bg-gray-100 transition"
           title="Home"
         >

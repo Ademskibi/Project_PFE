@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { jwtDecode as jwt_decode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // ✅ Correct import
 import { setUser } from '../../redux/slices/userSlice';
 import { clearCart } from '../../redux/slices/cartSlice';
 import { Eye, EyeOff } from 'lucide-react';
-
+import logo from '../Login/etap.png'; // Adjust the path as necessary
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,6 +42,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!email || !password) {
       setError('❌ Please fill in all fields.');
       return;
@@ -64,11 +65,13 @@ const Login = () => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Login failed');
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
 
       const token = data.token;
       localStorage.setItem('token', token);
-      const decodedUser = jwt_decode(token);
+      const decodedUser = jwtDecode(token); // ✅ Correct usage
 
       dispatch(setUser({ user: decodedUser, token }));
       dispatch(clearCart(decodedUser._id));
@@ -82,15 +85,25 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md transition-all duration-300">
+        <div className="flex justify-center mb-4">
+          <img
+            src={logo}
+            alt="Company Logo"
+            className="h-16 w-auto"
+          />
+        </div>
         <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
           Welcome Back 👋
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="text-sm font-medium text-gray-600">Email address</label>
+            <label htmlFor="email" className="text-sm font-medium text-gray-600">
+              Email address
+            </label>
             <input
+              id="email"
               type="email"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="you@example.com"
@@ -100,8 +113,11 @@ const Login = () => {
           </div>
 
           <div className="relative">
-            <label className="text-sm font-medium text-gray-600">Password</label>
+            <label htmlFor="password" className="text-sm font-medium text-gray-600">
+              Password
+            </label>
             <input
+              id="password"
               type={showPassword ? 'text' : 'password'}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10"
               placeholder="••••••••"

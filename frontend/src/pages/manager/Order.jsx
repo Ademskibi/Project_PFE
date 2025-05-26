@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OrderCard from "./OrderCard";
-import NavbarManger from "../../components/NavbarManger";
+import NavbarManger from "./NavbarManger";
 import { useSelector } from "react-redux";
 
 const Order = () => {

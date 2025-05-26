@@ -2,39 +2,37 @@ import React, { useEffect, useState } from "react";
 
 const OrderCard = ({ order, onOrderAction }) => {
   const [products, setProducts] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!order?.items?.length) return;
+
     const fetchProducts = async () => {
       try {
         const responses = await Promise.all(
           order.items.map((item) => {
-            const productId = item?.productId?._id;
-            console.log("Fetching product ID:", productId);
-    
+            const productId = item?.productId?._id || item?.productId;
             return productId
-              ? fetch(`http://localhost:5000/api/product/${productId}`, {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                }).then((res) => res.json())
+              ? fetch(`http://localhost:5000/api/product/${productId}`).then(
+                  (res) => res.json()
+                )
               : Promise.resolve(null);
           })
         );
-    
+
         const productsMap = {};
         order.items.forEach((item, index) => {
-          const productId = item?.productId?.toString?.();
+          const productId = item?.productId?._id || item?.productId;
           if (productId) {
             productsMap[productId] = responses[index];
           }
         });
-    
+
         setProducts(productsMap);
       } catch (err) {
         console.error("❌ Failed to fetch products:", err);
       }
     };
-    
 
     fetchProducts();
   }, [order]);
@@ -66,10 +64,10 @@ const OrderCard = ({ order, onOrderAction }) => {
   }, [order]);
 
   const handleWaitinglist = async (product, orderId) => {
+    if (!product?._id) return;
+    setLoading(true);
     try {
-      if (!product?._id) return;
-
-      const response = await fetch(
+      await fetch(
         `http://localhost:5000/api/waiting/${orderId}/${product._id}`,
         {
           method: "POST",
@@ -78,9 +76,7 @@ const OrderCard = ({ order, onOrderAction }) => {
         }
       );
 
-      if (!response.ok) throw new Error("❌ Failed to add to waiting list");
-
-      const removeItemRes = await fetch(
+      await fetch(
         `http://localhost:5000/api/remove-item/${orderId}/${product._id}`,
         {
           method: "DELETE",
@@ -88,16 +84,12 @@ const OrderCard = ({ order, onOrderAction }) => {
         }
       );
 
-      if (!removeItemRes.ok)
-        throw new Error("❌ Failed to remove item from order");
-
-      // ✅ Now trigger the notification (after success)
       await fetch("http://localhost:5000/api/create_notification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: order.employeeId,
-          message: "Add to waiting list",
+          message: "Added to waiting list",
           type: "waiting",
           order: order._id,
         }),
@@ -107,9 +99,11 @@ const OrderCard = ({ order, onOrderAction }) => {
     } catch (error) {
       console.error("❌ Error:", error.message);
     }
+    setLoading(false);
   };
 
   const handleUpdateStatus = async (orderId) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `http://localhost:5000/api/orders/${orderId}/status`,
@@ -125,7 +119,6 @@ const OrderCard = ({ order, onOrderAction }) => {
         return;
       }
 
-      // ✅ Create notification only after success
       await fetch("http://localhost:5000/api/create_notification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,26 +135,28 @@ const OrderCard = ({ order, onOrderAction }) => {
     } catch (error) {
       console.error("❌ Error updating status:", error.message);
     }
+    setLoading(false);
   };
 
   return (
-    <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100 mb-8 transition-all hover:shadow-2xl">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+    <div className="bg-white rounded-2xl p-6 border shadow transition hover:shadow-lg mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
             🧾 Order #{order.OrderId}
           </h2>
-          <div className="text-sm text-gray-600">
-            <p><strong>Status:</strong> {order.status}</p>
-            <p>
-              <strong>Created At:</strong>{" "}
-              {new Date(order.createdAt).toLocaleString()}
-            </p>
-          </div>
+          <p className="text-sm text-gray-600">
+            <strong>Status:</strong> {order.status}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Created At:</strong>{" "}
+            {new Date(order.createdAt).toLocaleString()}
+          </p>
         </div>
         <button
-          className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl font-medium shadow-md transition"
+          className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl font-medium shadow disabled:opacity-50"
           onClick={() => handleUpdateStatus(order._id)}
+          disabled={loading}
         >
           ✅ Ready to Pick Up
         </button>
@@ -169,27 +164,26 @@ const OrderCard = ({ order, onOrderAction }) => {
 
       <div className="space-y-4">
         {order.items.map((item) => {
-          const productId = item?.productId?.toString?.();
+          const productId = item?.productId?._id || item?.productId;
           const product = productId ? products[productId] : null;
 
           return (
             <div
               key={item._id}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 border rounded-xl transition hover:shadow-md"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-100 p-4 rounded-xl border"
             >
               <div className="flex items-center gap-4">
                 {product?.imgUrl ? (
                   <img
                     src={product.imgUrl}
                     alt={product.name}
-                    className="w-24 h-24 object-cover rounded-xl border border-gray-300"
+                    className="w-24 h-24 object-cover rounded-xl border"
                   />
                 ) : (
-                  <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded-xl text-xs text-gray-500">
+                  <div className="w-24 h-24 bg-gray-200 flex items-center justify-center rounded-xl text-xs text-gray-500 border">
                     No Image
                   </div>
                 )}
-
                 <div>
                   <p className="text-lg font-semibold text-gray-800">
                     {product?.name || "Unknown Product"}
@@ -213,9 +207,9 @@ const OrderCard = ({ order, onOrderAction }) => {
               </div>
 
               <button
-                className="mt-4 sm:mt-0 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl shadow transition disabled:opacity-50"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl shadow transition disabled:opacity-50"
                 onClick={() => handleWaitinglist(product, order._id)}
-                disabled={!product}
+                disabled={!product || loading}
               >
                 ⏳ Move to Waiting List
               </button>

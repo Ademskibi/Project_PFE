@@ -44,7 +44,7 @@ const OrderCard = ({ order, onOrderAction }) => {
       if (!response.ok) throw new Error("Failed to update order status");
 
       if (newStatus === "Declined") {
-        const updateResponse = await fetch("http://localhost:5000/api/products/update", {
+        const updateResponse = await fetch("http://localhost:5000/api/product/update", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -86,68 +86,62 @@ const OrderCard = ({ order, onOrderAction }) => {
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 transition-transform hover:scale-[1.01]">
-      {/* Table for Order Summary */}
-      <table className="w-full text-sm text-left text-gray-700 mb-4">
-        <thead className="hidden">
-          <tr>
-            <th>Employee</th>
-            <th>Stats</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-b">
-            <td className="py-2">
-              📛 <span className="font-semibold">{order.employeeId?.name || "Unknown"}</span>
-            </td>
-            <td className="py-2">
-              <button
-                onClick={() => navigate(`/user_stats/${order.employeeId?._id}`)}
-                className="text-blue-600 text-sm hover:underline"
-              >
-                📈 View Stats
-              </button>
-            </td>
-            <td className="py-2 text-gray-500">
-              📅 {new Date(order.date || order.createdAt).toLocaleString()}
-            </td>
-            <td className="py-2">
-              <div className="flex gap-2 flex-wrap">
+      {/* Order Summary as Table */}
+      <div className="mb-4 text-sm text-gray-700">
+        <table className="w-full text-left border-collapse">
+          <tbody>
+            <tr>
+              <td className="py-1 font-semibold">📛 Employee:</td>
+              <td>{order.employeeId?.name || "Unknown"}</td>
+            </tr>
+            <tr>
+              <td className="py-1 font-semibold">📈 Stats:</td>
+              <td>
                 <button
-                  type="button"
-                  onClick={() => handleUpdateStatus(order._id, "Approved")}
-                  className="px-4 py-1 bg-green-600 hover:bg-green-500 text-white rounded-xl shadow text-sm"
+                  onClick={() => navigate(`/user_stats/${order.employeeId?._id}`)}
+                  className="text-blue-600 hover:underline"
                 >
-                  ✅ Approve
+                  View Stats
                 </button>
-                {!isDeclining ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsDeclining(true)}
-                    className="px-4 py-1 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow text-sm"
-                  >
-                    ❌ Decline
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateStatus(order._id, "Declined", declineMessage)}
-                    className="px-4 py-1 bg-red-700 hover:bg-red-600 text-white rounded-xl shadow text-sm"
-                  >
-                    🚫 Confirm Decline
-                  </button>
-                )}
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+            <tr>
+              <td className="py-1 font-semibold">📅 Date:</td>
+              <td>{new Date(order.date || order.createdAt).toLocaleString()}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      {/* Decline message input */}
+      {/* Approve / Decline Buttons */}
+      <div className="flex gap-2 flex-wrap mb-4">
+        <button
+          onClick={() => handleUpdateStatus(order._id, "Approved")}
+          className="px-4 py-1 bg-green-600 hover:bg-green-500 text-white rounded-xl shadow text-sm"
+        >
+          ✅ Approve
+        </button>
+        {!isDeclining ? (
+          <button
+            onClick={() => setIsDeclining(true)}
+            className="px-4 py-1 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow text-sm"
+          >
+            ❌ Decline
+          </button>
+        ) : (
+          <button
+            onClick={() => handleUpdateStatus(order._id, "Declined", declineMessage)}
+            className="px-4 py-1 bg-red-700 hover:bg-red-600 text-white rounded-xl shadow text-sm"
+          >
+            🚫 Confirm Decline
+          </button>
+        )}
+      </div>
+
+      {/* Decline Message Input */}
       {isDeclining && (
-        <div className="mt-3">
-          <label className="block text-sm text-gray-700 mb-1 font-medium">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Reason for decline (optional):
           </label>
           <textarea
@@ -160,52 +154,47 @@ const OrderCard = ({ order, onOrderAction }) => {
         </div>
       )}
 
-      {/* List for dropdown toggle */}
-      <ul className="list-disc list-inside mt-4 text-sm text-gray-600">
-        <li>
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="text-gray-700 hover:text-black underline"
-          >
-            {showDetails ? "🔼 Hide Product Details" : "🔽 Show Product Details"}
-          </button>
-        </li>
-      </ul>
+      {/* Toggle Product Details */}
+      <div className="mb-4">
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="text-gray-700 hover:text-black underline text-sm"
+        >
+          {showDetails ? "❌ Hide Cart" : "🛒 Show Cart"}
+        </button>
+      </div>
 
-      {/* Product details table */}
+      {/* Cart-style Product Details */}
       {showDetails && (
-        <div className="overflow-x-auto mt-3">
-          <table className="min-w-full text-sm text-left text-gray-700 border rounded-xl overflow-hidden">
-            <thead className="bg-gray-100 text-xs uppercase font-semibold text-gray-600">
-              <tr>
-                <th className="px-4 py-3">Image</th>
-                <th className="px-4 py-3">Product Name</th>
-                <th className="px-4 py-3">Quantity</th>
-                <th className="px-4 py-3">Current Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.items.map((item) => {
-                const id = item.productId?._id || item.productId;
-                const product = productDetailsMap[id];
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {order.items.map((item) => {
+            const id = item.productId?._id || item.productId;
+            const product = productDetailsMap[id];
 
-                return (
-                  <tr key={id} className="border-t border-gray-200 hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-2">
-                      <img
-                        src={product?.imgUrl || "https://via.placeholder.com/60"}
-                        alt={product?.name || "Product"}
-                        className="w-14 h-14 object-cover rounded-md border"
-                      />
-                    </td>
-                    <td className="px-4 py-2">{product?.name || "Loading..."}</td>
-                    <td className="px-4 py-2">{item.quantity}</td>
-                    <td className="px-4 py-2">{product?.stock ?? "..."}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+            return (
+              <div
+                key={id}
+                className="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={product?.imgUrl || "https://via.placeholder.com/60"}
+                    alt={product?.name || "Product"}
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
+                  <div>
+                    <div className="font-semibold">{product?.name || "Loading..."}</div>
+                    <div className="text-sm text-gray-600">
+                      Quantity: <strong>{item.quantity}</strong>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Stock: <strong>{product?.stock ?? "..."}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

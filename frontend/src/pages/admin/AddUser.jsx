@@ -72,108 +72,119 @@ const AddUser = () => {
 
     return (
         <div>
-            <AdminNavbar/>
-            <div className="min-h-screen flex items-center justify-center bg-white p-4 relative">
-            
-            <ToastContainer position="top-right" autoClose={3000} />
-            <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl z-10">
-                <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Add New User</h2>
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label htmlFor="userId" className="block mb-1 font-medium text-gray-700">User ID</label>
-                        <input
-                            id="userId"
-                            type="text"
-                            value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="name" className="block mb-1 font-medium text-gray-700">Name</label>
-                        <input
-                            id="name"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="email" className="block mb-1 font-medium text-gray-700">Email</label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="password" className="block mb-1 font-medium text-gray-700">Password</label>
-                        <div className="relative">
+            <AdminNavbar />
+            <div className="min-h-screen flex items-center justify-center bg-white p-4">
+                <ToastContainer position="top-right" autoClose={3000} />
+                <div className="w-full max-w-4xl bg-white p-8 rounded-2xl shadow-2xl">
+                    <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Add New User</h2>
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Left column */}
+                        <div>
+                            <label htmlFor="userId" className="block mb-1 font-medium text-gray-700">User ID</label>
                             <input
-                                id="password"
-                                type={showPassword ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                id="userId"
+                                type="text"
+                                value={userId}
+                                onChange={(e) => setUserId(e.target.value)}
                                 required
+                                placeholder="Enter user ID"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-3 flex items-center text-sm text-blue-500"
+                        </div>
+                        <div>
+                            <label htmlFor="name" className="block mb-1 font-medium text-gray-700">Name</label>
+                            <input
+                                id="name"
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                                placeholder="Enter full name"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="email" className="block mb-1 font-medium text-gray-700">Email</label>
+                            <input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                placeholder="example@email.com"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+                        {/* Right column */}
+                        <div>
+                            <label htmlFor="password" className="block mb-1 font-medium text-gray-700">Password</label>
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    placeholder="Enter password"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-3 flex items-center text-sm text-blue-500"
+                                >
+                                    {showPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="role" className="block mb-1 font-medium text-gray-700">Role</label>
+                            <select
+                                id="role"
+                                value={role}
+                                onChange={(e) => setRole(e.target.value)}
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                             >
-                                {showPassword ? "Hide" : "Show"}
+                                <option disabled value="">Select role</option>
+                                <option value="administrator">Administrator</option>
+                                <option value="storekeeper">Storekeeper</option>
+                                <option value="manager">Manager</option>
+                                <option value="employee">Employee</option>
+                                <option value="D_Rh">D_Rh</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="department" className="block mb-1 font-medium text-gray-700">Department</label>
+                            <select
+                                id="department"
+                                value={departmentId}
+                                onChange={(e) => setDepartmentId(e.target.value)}
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                                <option value="">
+                                    {loading ? "Loading departments..." : "Select department"}
+                                </option>
+                                {!loading && departments.map((dept) => (
+                                    <option key={dept._id} value={dept._id}>
+                                        {dept.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition duration-300"
+                            >
+                                Add User
                             </button>
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="role" className="block mb-1 font-medium text-gray-700">Role</label>
-                        <select
-                            id="role"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        >
-                            <option value="administrator">Administrator</option>
-                            <option value="storekeeper">Storekeeper</option>
-                            <option value="manager">Manager</option>
-                            <option value="employee">Employee</option>
-                            <option value="D_Rh">D_Rh</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="department" className="block mb-1 font-medium text-gray-700">Department</label>
-                        <select
-                            id="department"
-                            value={departmentId}
-                            onChange={(e) => setDepartmentId(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        >
-                            <option value="">{loading ? "Loading departments..." : "Select Department"}</option>
-                            {!loading && departments.map((dept) => (
-                                <option key={dept._id} value={dept._id}>
-                                    {dept.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition duration-300"
-                    >
-                        Add User
-                    </button>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
         </div>
     );
 };
