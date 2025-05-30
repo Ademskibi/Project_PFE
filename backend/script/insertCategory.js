@@ -1,25 +1,27 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import connectDB from "../config/db.js";
-import Category from "../models/Category.js"; // Utiliser un nom approprié
-import Product from "../models/Product.js";
+import Category from "../models/Category.js";
 
 dotenv.config();
 
 connectDB();
+
 const insertCategory = async () => {
   try {
-    const newCategory =await Category.create({
-        categoryId: "2", 
-        name:"Electronics",
-       items:['67adb2905e0f538159678505']
-    });
+    const categories = [
+      { categoryId: "1", name: "paper" },
+      { categoryId: "2", name: "stylo" },
+      { categoryId: "3", name: "recharge" }
+    ];
 
-    console.log("✅ product Inserted:", newCategory);
+    const insertedCategories = await Category.insertMany(categories);
+    console.log("✅ Categories Inserted:", insertedCategories);
   } catch (error) {
     console.error("❌ Insert Error:", error);
   } finally {
-  mongoose.connection.close();
+    mongoose.connection.close();
   }
 };
-insertCategory()
+
+insertCategory();

@@ -6,7 +6,6 @@ import Users from "./pages/admin/Users";
 import Login from "./pages/Login/Login";
 import AddUser from "./pages/admin/AddUser";
 import AddProduct from "./pages/admin/AddProduct";
-import Navbar from "./pages/emplyee/Navbar";
 import ProductsPage from "./pages/ProductsPage";
 import Mainpage from "./pages/emplyee/Mainpage";
 import AdminMain from "./pages/admin/AdminMain";
@@ -18,6 +17,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import NotAllowed from "./components/NotAllowed";
 import Supplies from "./pages/storekeeper/Supplies";
 import UserStats from "./pages/manager/UserStats";
+import SearchResults from './pages/SearchResults';
 function App() {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -99,6 +99,7 @@ function App() {
           </PrivateRoute>
         }
       />
+   
       <Route
         path="/Orders"
         element={
@@ -132,9 +133,12 @@ function App() {
         }
       />
       <Route
+       path="/search" element={<SearchResults />}
+      />
+      <Route
         path="/Supplies"
         element={
-          <PrivateRoute allowedRoles={["storekeeper"]}>
+          <PrivateRoute allowedRoles={["storekeeper","administrator"]}>
             <Supplies />
           </PrivateRoute>
         }

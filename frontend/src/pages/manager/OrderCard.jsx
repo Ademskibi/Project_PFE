@@ -138,7 +138,6 @@ const OrderCard = ({ order, onOrderAction }) => {
         )}
       </div>
 
-      {/* Decline Message Input */}
       {isDeclining && (
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">

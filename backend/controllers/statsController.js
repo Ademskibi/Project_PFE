@@ -11,7 +11,7 @@ export const getAdminStats = async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ status: "Not approved yet" });
-
+    
     // Prepare chart data (last 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5); // Last 6 months including current

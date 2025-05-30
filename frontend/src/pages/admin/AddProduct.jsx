@@ -88,7 +88,7 @@ const AddProduct = () => {
             if (!response.ok) throw new Error("Failed to add product");
 
             alert("✅ Product added successfully!");
-            navigate("/admin/products"); // optional
+            navigate("/supplies"); // optional
         } catch (error) {
             console.error(error);
             alert("❌ Failed to add product");

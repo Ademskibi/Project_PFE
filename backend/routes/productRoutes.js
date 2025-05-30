@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllProducts ,createProduct, getAProduct,getAvailableProducts ,deleteProduct , getProductsByCategory,updateProductStock} from "../controllers/productController.js";
+import { getAllProducts,searchProducts ,createProduct, getAProduct,getAvailableProducts ,deleteProduct , getProductsByCategory,updateProductStock} from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -10,5 +10,5 @@ router.delete("/product/delete",deleteProduct);
 router.get("/products/category/:categoryId", getProductsByCategory); 
 router.put("/product/update/", updateProductStock); 
 router.get("/products/available", getAvailableProducts);
-
+router.get('/products/search', searchProducts);
 export default router;
