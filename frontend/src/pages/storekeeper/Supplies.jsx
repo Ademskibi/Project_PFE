@@ -197,13 +197,24 @@ const Supplies = () => {
           </table>
         </div>
 
-        {selectedProductId && (
-          <ProductDetails
-            productId={selectedProductId}
-            onClose={() => setSelectedProductId(null)}
-            onUpdated={fetchProducts}
-          />
-        )}
+      {selectedProductId && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
+      <button
+        onClick={() => setSelectedProductId(null)}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold"
+      >
+        &times;
+      </button>
+      <ProductDetails
+        productId={selectedProductId}
+        onClose={() => setSelectedProductId(null)}
+        onUpdated={fetchProducts}
+      />
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );

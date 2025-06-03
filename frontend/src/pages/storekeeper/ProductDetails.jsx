@@ -117,7 +117,7 @@ const ProductDetails = ({ productId, onProductUpdated }) => {
           </h2>
 
           <div className="space-y-6">
-            <Input label="Item ID" name="itemId" value={formData.itemId} disabled />
+          
             <Input label="Name" name="name" value={formData.name} disabled />
 
             <div>

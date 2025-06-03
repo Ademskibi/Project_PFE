@@ -72,7 +72,7 @@ const NavbarManger = () => {
 
   return (
     <nav className="flex justify-between items-center px-8 py-4 bg-white border-b shadow-sm text-gray-900 relative">
-      <h2 className="text-2xl font-semibold tracking-wide">Supplies Inventory</h2>
+      <h2 className="text-2xl font-semibold tracking-wide">Manager Interface</h2>
 
       <div className="flex items-center gap-4 relative">
         {/* Home */}

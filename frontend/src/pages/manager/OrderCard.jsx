@@ -95,13 +95,13 @@ const OrderCard = ({ order, onOrderAction }) => {
               <td>{order.employeeId?.name || "Unknown"}</td>
             </tr>
             <tr>
-              <td className="py-1 font-semibold">📈 Stats:</td>
+              <td className="py-1 font-semibold">📈 History:</td>
               <td>
                 <button
                   onClick={() => navigate(`/user_stats/${order.employeeId?._id}`)}
                   className="text-blue-600 hover:underline"
                 >
-                  View Stats
+                  View hisotry 
                 </button>
               </td>
             </tr>
